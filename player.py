@@ -10,6 +10,9 @@ class Player:
         self.opponents = []
 
     def __str__(self):
+        return f"{self.last_name}"
+
+    def show_full_infos(self):
         if self.gender.lower() == "f":
             return f"Madame {self.first_name} {self.last_name} " \
                    f"née le {self.birth_date}, classement : {self.rank}, " \
@@ -57,7 +60,7 @@ class Player:
     def update_score(self, score):
         self.score = self.score + score
 
-
+'''
 print("------------------------ Test Player ---------------------------------")
 # Créer des joueurs
 playerA = Player("A", "", "15/12", "m", 100)
@@ -79,3 +82,4 @@ playerB.show_opponents()
 
 playerA.has_already_played_with(playerB)
 playerC.has_already_played_with(playerA)
+'''

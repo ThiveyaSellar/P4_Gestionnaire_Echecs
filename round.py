@@ -13,7 +13,7 @@ class Round:
         print("Start time : ")
         print(self.start_date_time)
         if self.end_date_time == "":
-            print("Le round est en cours")
+            print("Le round est en cours.")
         else:
             print("End time : ")
             print(self.end_date_time)
@@ -24,11 +24,14 @@ class Round:
     def stop_round(self):
         self.end_date_time = datetime.now().strftime("%d/%m/%Y à %H:%M")
 
-
+'''
 print("------------------------ Test Round ---------------------------------")
 tour = Round("Round 1")
 scoreA = 1
 scoreB = 0
-match = (["joueurA", scoreA],["joueur2", scoreB])
+match = (["joueurA", scoreA], ["joueur2", scoreB])
 tour.add_match(match)
 tour.show_status()
+tour.stop_round()
+tour.show_status()
+'''

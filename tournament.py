@@ -36,9 +36,9 @@ class Tournament:
         print(player.show_name() + " est ajouté au tournoi.")
 
     def show_players(self):
-        print("Liste des joueurs : ")
+        print("\nListe des joueurs : ")
         for n in range(len(self.players)):
-            print(self.players[n].show_name(), end=" ")
+            print(self.players[n], end=" ")
         print("\n")
 
     def add_round_one(self):
@@ -66,22 +66,26 @@ class Tournament:
             print("Nombre impaire de joueurs pour le tournoi")
         self.rounds.append(round_one)
 
+    def sort_players(self):
+        self.players = sorted(self.players, key=lambda x: (-x.score, x.rank))
+
+
     def add_next_round(self, round_name):
         round = Round(round_name)
         # Trier les joueurs selon le score puis le rang
-        print("* Avant le tri : ")
-        self.show_players()
-        self.players = sorted(self.players, key=lambda x: (-x.score, x.rank))
-        print("* Après le tri : ")
-        self.show_players()
-
+        # self.sort_players()
         # Liste initiale des joueurs
         players = self.players
         # Liste des joueurs qu'il reste à coupler
-        remaining_players = self.players
+        remaining_players = []
+        for i in range(len(self.players)):
+            remaining_players.append(self.players[i])
+
+        print("test remaining")
+        print(remaining_players)
         print("* Liste des joueurs qui reste à coupler :")
         for r in range(len(remaining_players)):
-            print(remaining_players[r].show_name(), end=" ")
+            print(remaining_players[r])
 
         # Nouvelle liste de couples de joueurs temporaire
         temp = []
@@ -92,7 +96,42 @@ class Tournament:
         while len(remaining_players) > 0:
             if len(remaining_players) == 2:
                 print("Il reste deux joueurs.")
-                break
+                player = remaining_players[0]
+                opponent = remaining_players[1]
+                if player.has_already_played_with(opponent):
+                    print("Les deux joueurs restants ont déjà joué ensemble")
+                    for i in range(len(temp), 0, -1):
+                        if (
+                                player.has_already_played_with(temp[i][0]) and
+                                opponent.has_already_played_with(temp[i][1])
+                        ):
+                            print("Situation A")
+                            break
+                        elif (
+                                player.has_already_played_with(temp[i][0]) and
+                                opponent.has_already_played_with(temp[i][1])
+                        ):
+                            print("Situation B")
+                            break
+                    break
+                else:
+                    temp.append([
+                        player,
+                        opponent
+                    ])
+
+                    print("\n* Liste des couples de joueurs :")
+                    print(temp)
+                    print()
+
+                    remaining_players.remove(player)
+                    remaining_players.remove(opponent)
+
+                    print("* Liste des joueurs qui reste à coupler :")
+                    for r in range(len(remaining_players)):
+                        print(remaining_players[r])
+                    print("\n")
+                    break
             else:
                 player = remaining_players[0]
                 print("Joueur : " + player.show_name())
@@ -101,8 +140,8 @@ class Tournament:
                         continue
                     else:
                         temp.append([
-                            player.show_name(),
-                            opponent.show_name()
+                            player,
+                            opponent
                         ])
 
                         print("\n* Liste des couples de joueurs :")
@@ -114,11 +153,23 @@ class Tournament:
 
                         print("* Liste des joueurs qui reste à coupler :")
                         for r in range(len(remaining_players)):
-                            print(remaining_players[r].show_name(), end=" ")
+                            print(remaining_players[r])
                         print("\n")
                         break
 
-       # When temp is official add opponents in players
+        for b in range(len(self.players)):
+            print("Les adversaires de " + self.players[b].show_name())
+            self.players[b].show_opponents()
+            print("\n")
+
+        for pair in range(len(temp)):
+            temp[pair][0].add_opponent(temp[pair][1])
+            temp[pair][1].add_opponent(temp[pair][0])
+
+        print("test")
+        for a in range(len(self.players)):
+            print("Les adversaires de " + self.players[a].show_name())
+            self.players[a].show_opponents()
     '''
         for p in range(len(players)):
             print("p : " + players[p].show_name())
@@ -152,36 +203,51 @@ class Tournament:
         print(temp)
     '''
 
-    def test_update_score(self):
-        self.players[0].update_score(1)
-        self.players[1].update_score(0.5)
-        self.players[2].update_score(0)
-        self.players[3].update_score(0)
-        self.players[4].update_score(0)
-        self.players[5].update_score(0.5)
-        self.players[6].update_score(1)
-        self.players[7].update_score(1)
 
 
+
+print("--------------- Tournament ---------------")
 tournoi = Tournament("Championnat", "Paris", "15/11", "blitz", "test")
 
 # Ajout de 8 joueurs au tournoi
-lettre = 'A'
-classement = 100
-for i in range(8):
-    participant = Player(lettre, "", "", "f", classement)
-    lettre = chr(ord(lettre)+1)
-    classement = classement + 10
-    tournoi.add_player(participant)
+playerA = Player("A", "a", "", "f", 100)
+playerB = Player("B", "b", "", "m", 110)
+playerC = Player("C", "c", "", "f", 120)
+playerD = Player("D", "d", "", "m", 130)
+playerE = Player("E", "e", "", "f", 140)
+playerF = Player("F", "f", "", "m", 150)
+playerG = Player("G", "g", "", "f", 160)
+playerH = Player("H", "h", "", "m", 170)
+tournoi.add_player(playerA)
+tournoi.add_player(playerB)
+tournoi.add_player(playerC)
+tournoi.add_player(playerD)
+tournoi.add_player(playerE)
+tournoi.add_player(playerF)
+tournoi.add_player(playerG)
+tournoi.add_player(playerH)
 
 # Affichage des noms des joueurs du tournoi
 tournoi.show_players()
 
-# Ajout du premier round
+# Premier round
 tournoi.add_round_one()
 
-# MAJ score
-tournoi.test_update_score()
+# Ajout des scores
+playerA.update_score(1)
+playerB.update_score(0.5)
+playerC.update_score(0)
+playerD.update_score(0)
+playerE.update_score(0)
+playerF.update_score(0.5)
+playerG.update_score(1)
+playerH.update_score(1)
 
-print("\nTest round 2:\n")
-tournoi.add_next_round("Round 2")
+# Trier
+tournoi.sort_players()
+
+tournoi.show_players()
+
+
+
+

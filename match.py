@@ -17,5 +17,14 @@ class Match:
         self.match = (
             [self.player_a, self.score_a], [self.player_b, self.score_b]
         )
+        self.finished = True
 
+
+'''
+print("------------------------ Test Match ---------------------------------")
+match = Match("joueur1", "joueur2")
+print(match)
+match.add_score(1, 0)
+print(match)
+'''
 
