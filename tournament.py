@@ -204,8 +204,6 @@ class Tournament:
     '''
 
 
-
-
 print("--------------- Tournament ---------------")
 tournoi = Tournament("Championnat", "Paris", "15/11", "blitz", "test")
 
@@ -247,6 +245,10 @@ playerH.update_score(1)
 tournoi.sort_players()
 
 tournoi.show_players()
+
+# Round suivant
+tournoi.add_next_round("Round 2")
+
 
 
 
