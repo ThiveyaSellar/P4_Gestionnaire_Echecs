@@ -38,12 +38,15 @@ class Player:
 
     def show_opponents(self):
         for opponent in self.opponents:
-            print(opponent.show_name())
+            print(opponent.show_name(), end=" ")
 
     def show_name(self):
         return self.last_name
 
     def has_already_played_with(self, player):
+        return player in self.opponents
+
+    def has_already_played_with2(self, player):
         if player in self.opponents:
             print(self.last_name
                   + " et "

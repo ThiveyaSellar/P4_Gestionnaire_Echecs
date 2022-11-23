@@ -5,6 +5,13 @@ from player import Player
 TIME = ("blitz", "bullet", "coup rapide")
 
 
+def show_players(players_list):
+    print("* Classement provisoire :")
+    for r in range(len(players_list)):
+        print(players_list[r], end=" ")
+    print()
+
+
 class Tournament:
 
     def __init__(
@@ -53,11 +60,9 @@ class Tournament:
         if nb_player % 2 == 0:
             half = int(nb_player/2)
             self.players.sort(key=lambda x: x.rank)
-            print("Les matchs du premier round : ")
             for p in range(half):
                 player_a = self.players[p]
                 player_b = self.players[p+half]
-                print(player_a.show_name() + " - " + player_b.show_name())
                 match = Match(player_a, player_b)
                 player_a.add_opponent(player_b)
                 player_b.add_opponent(player_a)
@@ -69,139 +74,141 @@ class Tournament:
     def sort_players(self):
         self.players = sorted(self.players, key=lambda x: (-x.score, x.rank))
 
+    def show_players_and_opponents(self):
+        for player in range(len(self.players)):
+            print("Les adversaires de " + self.players[player].show_name())
+            self.players[player].show_opponents()
 
-    def add_next_round(self, round_name):
+    def add_next_round2(self, round_name):
         round = Round(round_name)
-        # Trier les joueurs selon le score puis le rang
-        # self.sort_players()
-        # Liste initiale des joueurs
-        players = self.players
+        print(" ----------- " + round.show_name() + " ----------- ")
         # Liste des joueurs qu'il reste à coupler
         remaining_players = []
         for i in range(len(self.players)):
             remaining_players.append(self.players[i])
-
-        print("test remaining")
-        print(remaining_players)
-        print("* Liste des joueurs qui reste à coupler :")
-        for r in range(len(remaining_players)):
-            print(remaining_players[r])
-
+        show_players(remaining_players)
         # Nouvelle liste de couples de joueurs temporaire
         temp = []
-        print("\n* Liste des couples de joueurs :")
-        print(temp)
-        print()
 
         while len(remaining_players) > 0:
             if len(remaining_players) == 2:
-                print("Il reste deux joueurs.")
                 player = remaining_players[0]
                 opponent = remaining_players[1]
                 if player.has_already_played_with(opponent):
-                    print("Les deux joueurs restants ont déjà joué ensemble")
-                    for i in range(len(temp), 0, -1):
-                        if (
-                                player.has_already_played_with(temp[i][0]) and
-                                opponent.has_already_played_with(temp[i][1])
+                    for i in range(len(temp)-1, -1, -1):
+                        a = temp[i][0]
+                        b = temp[i][1]
+                        if not (
+                                player.has_already_played_with(a) and
+                                opponent.has_already_played_with(b)
                         ):
-                            print("Situation A")
+                            temp.remove([a, b])
+                            temp.extend([[a, player], [b, opponent]])
+                            remaining_players.remove(player)
+                            remaining_players.remove(opponent)
                             break
-                        elif (
-                                player.has_already_played_with(temp[i][0]) and
-                                opponent.has_already_played_with(temp[i][1])
+                        elif not (
+                                player.has_already_played_with(b) and
+                                opponent.has_already_played_with(a)
                         ):
-                            print("Situation B")
+                            temp.remove([a, b])
+                            temp.extend([[b, player], [a, opponent]])
+                            remaining_players.remove(player)
+                            remaining_players.remove(opponent)
                             break
-                    break
                 else:
-                    temp.append([
-                        player,
-                        opponent
-                    ])
-
-                    print("\n* Liste des couples de joueurs :")
-                    print(temp)
-                    print()
-
+                    temp.append([player, opponent])
                     remaining_players.remove(player)
                     remaining_players.remove(opponent)
-
-                    print("* Liste des joueurs qui reste à coupler :")
-                    for r in range(len(remaining_players)):
-                        print(remaining_players[r])
-                    print("\n")
-                    break
             else:
                 player = remaining_players[0]
-                print("Joueur : " + player.show_name())
+                print()
                 for opponent in remaining_players[1:len(remaining_players)]:
                     if player.has_already_played_with(opponent):
                         continue
                     else:
-                        temp.append([
-                            player,
-                            opponent
-                        ])
-
-                        print("\n* Liste des couples de joueurs :")
-                        print(temp)
-                        print()
-
+                        temp.append([player, opponent])
                         remaining_players.remove(player)
                         remaining_players.remove(opponent)
-
-                        print("* Liste des joueurs qui reste à coupler :")
-                        for r in range(len(remaining_players)):
-                            print(remaining_players[r])
-                        print("\n")
                         break
-
-        for b in range(len(self.players)):
-            print("Les adversaires de " + self.players[b].show_name())
-            self.players[b].show_opponents()
-            print("\n")
+                show_players(remaining_players)
 
         for pair in range(len(temp)):
-            temp[pair][0].add_opponent(temp[pair][1])
-            temp[pair][1].add_opponent(temp[pair][0])
+            player_a = temp[pair][0]
+            player_b = temp[pair][1]
+            player_a.add_opponent(player_b)
+            player_b.add_opponent(player_a)
+            match = Match(player_a, player_b)
+            round.add_match(match)
+            print(player_a.show_name() + " - " + player_b.show_name())
 
-        print("test")
-        for a in range(len(self.players)):
-            print("Les adversaires de " + self.players[a].show_name())
-            self.players[a].show_opponents()
-    '''
-        for p in range(len(players)):
-            print("p : " + players[p].show_name())
-            # Vérifier que le joueur n'est pas déjà couplé à un autre joueur
-            player_in_temp = False
-            for i in range(len(temp)):
-                if players[p].show_name() in temp[i]:
-                    player_in_temp = True
-                    break
+        round.show_matchs()
+
+    def add_next_round(self, round_name):
+        round = Round(round_name)
+        print(" ----------- " + round.show_name() + " ----------- ")
+        # Liste des joueurs qu'il reste à coupler
+        remaining_players = []
+        for i in range(len(self.players)):
+            remaining_players.append(self.players[i])
+        show_players(remaining_players)
+        # Nouvelle liste de couples de joueurs temporaire
+        temp = []
+
+        while len(remaining_players) > 0:
             if len(remaining_players) == 2:
-                print("Il reste deux joueurs")
-            else:
-                if player_in_temp:
-                    continue
-                else:
-                    for v in range(p+1, len(players)):
-                        # Vérifier qu'il n'a pas déjà joué avec son voisin
-                        # S'il a déjà joué on passe au voisin suivant
-                        # Sinon on les ajoute ensemble à temp
-                        if players[p].has_already_played_with(players[v]):
-                            continue
-                        else:
-                            temp.append([
-                                players[p].show_name(),
-                                players[v].show_name()
-                            ])
-                            remaining_players.remove(players[p].show_name())
-                            remaining_players.remove(players[v].show_name())
+                player = remaining_players[0]
+                opponent = remaining_players[1]
+                if player.has_already_played_with(opponent):
+                    for i in range(len(temp)-1, -1, -1):
+                        a = temp[i][0]
+                        b = temp[i][1]
+                        if not (
+                                player.has_already_played_with(a) and
+                                opponent.has_already_played_with(b)
+                        ):
+                            temp.remove([a, b])
+                            temp.extend([[a, player], [b, opponent]])
+                            remaining_players.remove(player)
+                            remaining_players.remove(opponent)
                             break
-            print(remaining_players)
-        print(temp)
-    '''
+                        elif not (
+                                player.has_already_played_with(b) and
+                                opponent.has_already_played_with(a)
+                        ):
+                            temp.remove([a, b])
+                            temp.extend([[b, player], [a, opponent]])
+                            remaining_players.remove(player)
+                            remaining_players.remove(opponent)
+                            break
+                else:
+                    temp.append([player, opponent])
+                    remaining_players.remove(player)
+                    remaining_players.remove(opponent)
+            else:
+                player = remaining_players[0]
+                for opponent in remaining_players[1:len(remaining_players)]:
+                    if player.has_already_played_with(opponent):
+                        continue
+                    else:
+                        temp.append([player, opponent])
+                        remaining_players.remove(player)
+                        remaining_players.remove(opponent)
+                        break
+
+        for pair in range(len(temp)):
+            player_a = temp[pair][0]
+            player_b = temp[pair][1]
+            player_a.add_opponent(player_b)
+            player_b.add_opponent(player_a)
+            match = Match(player_a, player_b)
+            round.add_match(match)
+        round.show_matchs()
+
+    def show_rounds(self):
+        for round in self.rounds:
+            print(round.show_name() + ":")
+            round.show_matchs()
 
 
 print("--------------- Tournament ---------------")
@@ -231,6 +238,7 @@ tournoi.show_players()
 # Premier round
 tournoi.add_round_one()
 
+
 # Ajout des scores
 playerA.update_score(1)
 playerB.update_score(0.5)
@@ -248,6 +256,30 @@ tournoi.show_players()
 
 # Round suivant
 tournoi.add_next_round("Round 2")
+
+playerA.update_score(0.5)
+playerB.update_score(0)
+playerC.update_score(0.5)
+playerD.update_score(0)
+playerE.update_score(1)
+playerF.update_score(0.5)
+playerG.update_score(0.5)
+playerH.update_score(1)
+
+tournoi.sort_players()
+tournoi.add_next_round("Round 3")
+
+playerA.update_score(0)
+playerB.update_score(0.5)
+playerC.update_score(0.5)
+playerD.update_score(1)
+playerE.update_score(0.5)
+playerF.update_score(0)
+playerG.update_score(0.5)
+playerH.update_score(1)
+
+tournoi.sort_players()
+tournoi.add_next_round("Round 4")
 
 
 

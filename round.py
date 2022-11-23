@@ -24,6 +24,13 @@ class Round:
     def stop_round(self):
         self.end_date_time = datetime.now().strftime("%d/%m/%Y à %H:%M")
 
+    def show_matchs(self):
+        for match in self.matchs:
+            match.show_infos()
+
+    def show_name(self):
+        return self.name
+
 '''
 print("------------------------ Test Round ---------------------------------")
 tour = Round("Round 1")
