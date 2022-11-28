@@ -1,6 +1,6 @@
-from round import Round
-from match import Match
-from player import Player
+from models.round import Round
+from models.match import Match
+from models.player import Player
 
 TIME = ("blitz", "bullet", "coup rapide")
 
