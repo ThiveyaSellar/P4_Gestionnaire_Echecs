@@ -1,7 +1,6 @@
-from tournament import Tournament
-from round import Round
-from player import Player
-from match import Match
+from models.tournament import Tournament
+from models.player import Player
+
 
 # Afficher tous les acteurs
 # par ordre alaphabétique
