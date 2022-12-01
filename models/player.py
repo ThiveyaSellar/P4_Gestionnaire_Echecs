@@ -22,6 +22,9 @@ class Player:
                    f"né le {self.birth_date}, classement : {self.rank}, " \
                     f"score: {self.score}."
 
+    def show_infos(self):
+        print(f"{self.rank}     {self.last_name}    {self.first_name}")
+
     def __repr__(self):
         return str(self)
 

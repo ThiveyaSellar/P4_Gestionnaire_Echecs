@@ -1,5 +1,5 @@
-from player import Player
-from tournament import Tournament
+from models.player import Player
+from models.tournament import Tournament
 
 
 class Manager:

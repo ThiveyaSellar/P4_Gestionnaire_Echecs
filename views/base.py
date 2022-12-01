@@ -1,3 +1,5 @@
+from models.player import Player
+
 class View:
 
     def __init__(self):
@@ -47,6 +49,17 @@ class View:
         while answer != "Y" and answer != "N":
             answer = input("Ajouter un autre joueur ? (Y/N)\n").upper()
         return True if answer == "Y" else False
+
+    def display_all_players(self, players):
+        for player in players:
+            player.show_infos()
+
+    def get_player_index(self):
+        return input("Quel est le numéro du joueur à modifier ? \n")
+
+    def get_new_rank(self):
+        return input('Quel est le nouveau classement de ce joueur ? \n')
+
 
 
 v = View()

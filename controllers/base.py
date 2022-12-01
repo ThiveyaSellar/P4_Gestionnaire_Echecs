@@ -34,27 +34,40 @@ class Controller:
 
     def show_players(self):
         players_table = self.db.table('players')
-        serialized_players = players_table.all()
-        self.view.display_all_players(serialized_players)
+        serialized_players = players_table.all() # À ordonner selon classement
+        players = []
+        for sp in serialized_players:
+            player = Player(
+                sp["last_name"],
+                sp["first_name"],
+                sp["birth_date"],
+                sp["gender"],
+                sp["rank"]
+            )
+            players.append(player)
+        self.view.display_all_players(players)
 
     def update_player_rank(self, i, new_rank):
         players_table = self.db.table('players')
         players_table.update({'rank': new_rank}, doc_ids=[i])
+        # Update automatique des classements des autres joueurs ?
+        # Si deux joueurs ont le même classement
 
     def run(self):
         running = True
         while running:
-            choice = self.view.display_main_menu()
+            choice = int(self.view.display_main_menu())
+
             if choice == 1:
                 # Gestion des joueurs
-                option = self.view.display_player_management_options()
+                option = int(self.view.display_player_management_options())
                 if option == 1:
                     # Ajouter un nouveau joueur
                     new_player = True
                     while new_player:
                         self.get_player_data()
                         # Un autre joueur à insérer ?
-                        new_player = self.view.ask_new_player() # Ici
+                        new_player = self.view.ask_new_player()
                 elif option == 2:
                     # Afficher tous les joueurs
                     self.show_players()
@@ -63,7 +76,7 @@ class Controller:
                     # Demander le nouveau classement
                     rank = self.view.get_new_rank()
                     # Modifier un joueur (son classement)
-                    self.update_player_rank(i, rank)
+                    self.update_player_rank(i, rank) # Ici
                     # Afficher après la modification
                     self.show_players()
                 elif option == 3:
@@ -76,3 +89,4 @@ class Controller:
                 # Nouveau tournoi
             elif choice == 3:
                 # Rapports'''
+            print("Hello")
