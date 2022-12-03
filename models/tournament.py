@@ -7,6 +7,8 @@ TIME = ("blitz", "bullet", "coup rapide")
 
 class Tournament:
 
+    NB_PLAYER = 8
+
     def __init__(
         self,
         name,

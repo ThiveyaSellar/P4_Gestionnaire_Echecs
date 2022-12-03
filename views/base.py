@@ -40,7 +40,7 @@ class View:
             "first_name": input("Prénom: \n"),
             "birth_date": input("Date de naissance: \n"),
             "gender": input("Sexe : \n"),
-            "rank": input("Classement : \n")
+            "rank": int(input("Classement : \n"))
         }
         return infos
 
@@ -55,10 +55,40 @@ class View:
             player.show_infos()
 
     def get_player_index(self):
-        return input("Quel est le numéro du joueur à modifier ? \n")
+        return int(input('Quel est le numéro du joueur ? \n'))
 
     def get_new_rank(self):
-        return input('Quel est le nouveau classement de ce joueur ? \n')
+        return int(input('Quel est le nouveau classement de ce joueur ? \n'))
+
+    def get_tournament_infos(self):
+        infos = {
+            "name": input("Nom du tournoi : \n"),
+            "location": input("Lieu du tournoi : \n"),
+            "date": input("Date : \n"),
+            "time_control": input("Contrôle du temps : 1 2 3 \n"),
+            "description": input("Description : \n")
+        }
+        '''
+        print("Enter/Paste your content. Ctrl-D or Ctrl-Z ( windows ) to save it.")
+        contents = []
+        while True:
+            try:
+                line = input()
+            except EOFError:
+                break
+            contents.append(line)
+        '''
+        return infos
+
+    def add_player(self, ids):
+        print(ids)
+        pid = input("Numéro du joueur : \n")
+        correct = True if pid in ids else False
+        while not correct:
+            print("Numéro non présent ou déjà choisi. \n")
+            pid = input("Numéro du joueur : \n")
+            correct = True if pid in ids else False
+        return pid
 
 
 
