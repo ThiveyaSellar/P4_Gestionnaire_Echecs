@@ -88,13 +88,14 @@ class Controller:
             p_id = self.view.add_player(players_id)
             # Créer le joueur et l'ajouter au tournoi grâce à l'id
             p_id = int(p_id)
+            print(p_id)
             tournament.add_player(
                 Player(
-                    players[p_id]['last_name'],
-                    players[p_id]['first_name'],
-                    players[p_id]['birth_date'],
-                    players[p_id]['gender'],
-                    int(players[p_id]['rank']),
+                    players[p_id-1]['last_name'],
+                    players[p_id-1]['first_name'],
+                    players[p_id-1]['birth_date'],
+                    players[p_id-1]['gender'],
+                    int(players[p_id-1]['rank']),
                 )
             )
             # Retirer de la liste des joueurs
