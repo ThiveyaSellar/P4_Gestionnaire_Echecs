@@ -54,6 +54,18 @@ class Controller:
         for sp in serialized_players:
             print(f"{sp.doc_id}     {sp['last_name']} {sp['first_name']} ({sp['rank']})")
 
+    def show_players_to_add(self, id_list):
+        for id in id_list:
+            # Afficher le joueur dont l'id correspond
+            players_table = self.db.table('players')
+            p = players_table.get(doc_id=id)
+            print(
+                f"{p.doc_id}     "
+                f"{p['last_name']} "
+                f"{p['first_name']} "
+                f"({p['rank']})"
+            )
+
     def update_player_rank(self):
         # Récupérer le nom et prénom du joueur
         i = self.view.get_player_index()
@@ -78,17 +90,19 @@ class Controller:
         return tournament
 
     def add_players(self, tournament):
-        # Récupérer tous les id dans la table joueur
+        # Récupérer tous les joueurs dans la table joueur
         players = self.db.table('players').all()
         players_id = []
+        # Récupérer tous les id
         for p in players:
             players_id.append(str(p.doc_id))
-        for p in range(tournament.NB_PLAYER):
+        for p in range(tournament.NB_PLAYERS):
+            # Montrer les joueurs
+            self.show_players_to_add(players_id)
             # Demander l'id du joueur
             p_id = self.view.add_player(players_id)
             # Créer le joueur et l'ajouter au tournoi grâce à l'id
             p_id = int(p_id)
-            print(p_id)
             tournament.add_player(
                 Player(
                     players[p_id-1]['last_name'],
@@ -100,8 +114,13 @@ class Controller:
             )
             # Retirer de la liste des joueurs
             players_id.remove(str(p_id))
-        tournament.sort_players()
-        tournament.show_players()
+
+    def update_players_scores(self, tournament):
+        # Pour chaque joueur demander le score
+        for player in tournament.get_players():
+            # Demander le score
+            score = self.view.ask_score(player.get_name())
+            player.update_score(score)
 
     def run(self):
         running = True
@@ -132,14 +151,43 @@ class Controller:
                 # Nouveau tournoi
                 # Demander les infos sur le tournoi
                 tournament = self.create_tournament()
-                # Afficher la liste des joueurs
-                self.show_players()
                 # Ajouter 8 joueurs
                 self.add_players(tournament)
-
+                # Demander si on commence le tournoi
+                start = self.view.ask_starting()
+                # Si oui commence sinon retour au menu principal
+                if start:
+                    # Premier round
+                    round_name = self.view.ask_round_name()
+                    round = tournament.prepare_round_one(round_name)
+                    tournament.add_round(round)
+                    # Demander si le tour est terminé
+                    self.view.ask_ending_round()
+                    # Saisir les scores
+                    self.update_players_scores(tournament)
+                    # Demander si on passe au tour suivant
+                    continuing = self.view.ask_continuing()
+                    while continuing and tournament.is_remaining_rounds():
+                        # Demander le nom du round
+                        round_name = self.view.ask_round_name()
+                        round = tournament.prepare_next_round(round_name)
+                        tournament.add_round(round)
+                        # Demander si le tour est terminé
+                        self.view.ask_ending_round()
+                        # Saisir les scores
+                        self.update_players_scores(tournament)
+                        # Demander si on passe au tour suivant
+                        continuing = self.view.ask_continuing()
+                    if tournament.is_remaining_rounds():
+                        print("Tournoi mis en pause")
+                    else:
+                        print("Fin du tournoi")
             elif choice == 3:
-                # Rapports'''
-                print("Rapports")
+                # Reprendre le tournoi
+                print("Reprendre le tournoi")
             elif choice == 4:
+                # Liste de rapports
+                print("Liste des rapports")
+            elif choice == 5:
                 # Quitter
                 running = False

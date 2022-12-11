@@ -68,20 +68,9 @@ class View:
             "time_control": input("Contrôle du temps : 1 2 3 \n"),
             "description": input("Description : \n")
         }
-        '''
-        print("Enter/Paste your content. Ctrl-D or Ctrl-Z ( windows ) to save it.")
-        contents = []
-        while True:
-            try:
-                line = input()
-            except EOFError:
-                break
-            contents.append(line)
-        '''
         return infos
 
     def add_player(self, ids):
-        print(ids)
         pid = input("Numéro du joueur : \n")
         correct = True if pid in ids else False
         while not correct:
@@ -90,10 +79,68 @@ class View:
             correct = True if pid in ids else False
         return pid
 
+    def ask_starting(self):
 
+        answer = input(
+            "Voulez-vous commencer le tournoi ? (Oui/Non)"
+        ).upper()
+        '''
+        while True:
+            answer = input(
+                "Voulez-vous commencer le tournoi ? (Y/N)"
+            )
+            if answer == 'Y':
+                break
+            elif answer == 'N':
+                break
+        '''
+        while answer != "OUI" and answer != "NON":
+            answer = input(
+                "Voulez-vous commencer le tournoi ? (Oui/Non)"
+            ).upper()
+        return True if answer == "OUI" else False
 
-v = View()
+    def ask_ending_round(self):
+        print("Tour en cours ... ")
+        answer = input(
+            "Quand le tour est terminé saisir 'FIN'.  \n"
+        ).upper()
+        while answer != 'FIN':
+            answer = input(
+                 "Quand le tour est terminé saisir 'FIN'.  \n"
+            ).upper()
+
+    def ask_score(self, player_name):
+        print(f"Quel est le score de {player_name}?")
+        score = int(input(
+            f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+        ))
+        while score != 1 and score != 0.5 and score != 0:
+            print(f"Quel est le score de {player_name}?")
+            score = int(input(
+                f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+            ))
+        return score
+
+    def ask_continuing(self):
+        answer = input(
+            "Voulez-vous passer au tour suivant ? (Oui/Non)  \n"
+        ).upper()
+        while answer != "OUI" and answer != "NON":
+            answer = input(
+                "Voulez-vous passer au tour suivant ? (Oui/Non)  \n"
+            ).upper()
+        return True if answer == "OUI" else False
+    
+    def ask_round_name(self):
+        round_name = input(
+            "Quel est le nom du round ? \n"
+        )
+        return round_name
+
 '''
+v = View()
+
 v.display_main_menu()
 v.display_player_management_options()
 infos = v.prompt_for_player()

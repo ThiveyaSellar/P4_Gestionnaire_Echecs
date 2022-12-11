@@ -7,7 +7,8 @@ TIME = ("blitz", "bullet", "coup rapide")
 
 class Tournament:
 
-    NB_PLAYER = 8
+    NB_PLAYERS = 8
+    NB_ROUNDS = 4
 
     def __init__(
         self,
@@ -27,6 +28,7 @@ class Tournament:
         self.time_control = time_control
         self.description = description
         self.ranking = []
+        self.remaining_rounds = self.NB_ROUNDS
 
     def __str__(self):
         return f"Tournoi {self.name} à {self.location} le {self.date}."
@@ -47,14 +49,33 @@ class Tournament:
     def sort_players(self):
         self.players = sorted(self.players, key=lambda x: (-x.score, x.rank))
 
-    def add_round_one(self):
+    '''
+    def decorate(function):
+        def wrapper(tournament):
+            # Trier les joueurs selon leurs scores et leurs classements
+            tournament.sort_players()
+            # Afficher le classement provisoire du tournoi
+            tournament.show_players()
+            result = function()
+            return result
+        return wrapper
+    '''
+    def add_round(self, round):
+        self.rounds.append(round)
+        self.remaining_rounds = self.remaining_rounds - 1
+
+    def prepare_round_one(self, round_name):
         """
         Créer le premier round, trier les joueurs selon rang
         Diviser les joueurs en deux
         Associer les joueurs de la partie supérieure avec ceux de la partie
         inférieure et les faire jouer ensemble
         """
-        round = Round("Round 1")
+        # Ajoutées au lieu de decorate
+        self.sort_players()
+        self.show_players()
+
+        round = Round(round_name)
         nb_player = len(self.players)
         if nb_player % 2 == 0:
             half = int(nb_player/2)
@@ -68,11 +89,15 @@ class Tournament:
                 round.add_match(match)
         else:
             print("Nombre impaire de joueurs pour le tournoi")
-        self.rounds.append(round)
+        # self.rounds.append(round)
         print(" ----------- " + round.show_name() + " ----------- ")
         round.show_matchs()
+        return round
 
-    def add_next_round(self, round_name):
+    def prepare_next_round(self, round_name):
+        # Ajoutées au lieu de decorate
+        self.sort_players()
+        self.show_players()
         round = Round(round_name)
         print(" ----------- " + round.show_name() + " ----------- ")
         # Liste des joueurs qu'il reste à coupler
@@ -131,7 +156,9 @@ class Tournament:
             match = Match(player_a, player_b)
             round.add_match(match)
         round.show_matchs()
-        self.rounds.append(round)
+        # self.rounds.append(round)
+
+        return round
 
     def show_rounds(self):
         print("Liste de tous les tours d'un tournoi")
@@ -159,7 +186,13 @@ class Tournament:
             print(player.show_name(), end=" ")
         print()
 
+    def get_players(self):
+        return self.players
 
+    def is_remaining_rounds(self):
+        return True if self.remaining_rounds > 0 else False
+
+'''
 
 print("--------------- Tournament ---------------")
 tournoi = Tournament("Championnat", "Paris", "15/11", "blitz", "test")
@@ -232,3 +265,4 @@ tournoi.show_rounds_and_matchs()
 
 
 
+'''

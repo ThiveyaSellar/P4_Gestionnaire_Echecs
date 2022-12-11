@@ -25,6 +25,9 @@ class Player:
     def show_infos(self):
         print(f"{self.rank}     {self.last_name}    {self.first_name}")
 
+    def get_name(self):
+        return self.last_name + " " + self.first_name
+
     def __repr__(self):
         return str(self)
 
