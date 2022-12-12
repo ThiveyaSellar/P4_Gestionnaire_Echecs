@@ -65,6 +65,7 @@ class Controller:
                 f"{p['first_name']} "
                 f"({p['rank']})"
             )
+        print()
 
     def update_player_rank(self):
         # Récupérer le nom et prénom du joueur

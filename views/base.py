@@ -1,4 +1,6 @@
 from models.player import Player
+from models.tools import saisie_non_vide
+
 
 class View:
 
@@ -61,12 +63,16 @@ class View:
         return int(input('Quel est le nouveau classement de ce joueur ? \n'))
 
     def get_tournament_infos(self):
+        name = saisie_non_vide("Nom du tournoi :")
+        location = saisie_non_vide("Lieu du tournoi :")
+        # Vérifier la saisie valide d'une date
+
         infos = {
-            "name": input("Nom du tournoi : \n"),
-            "location": input("Lieu du tournoi : \n"),
-            "date": input("Date : \n"),
-            "time_control": input("Contrôle du temps : 1 2 3 \n"),
-            "description": input("Description : \n")
+            "name": name,
+            "location": location,
+            "date": saisie_non_vide("Date :"),
+            "time_control": saisie_non_vide(f"Contrôle du temps :\n {tourna}  2 3 \n"),
+            "description": saisie_non_vide("Description :")
         }
         return infos
 
