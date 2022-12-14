@@ -1,12 +1,9 @@
-from models.player import Player
-from models.tools import saisie_non_vide
+from models.tools import non_empty_input, valid_date, multiline_input
 
 
 class View:
 
-    def __init__(self):
-        pass
-
+    @staticmethod
     def display_main_menu(self):
         menu = """
         ----- Menu principal -----
@@ -22,6 +19,7 @@ class View:
         print()
         return choice
 
+    @staticmethod
     def display_player_management_options(self):
         menu = """
         ----- Gestion des joueurs -----
@@ -36,6 +34,7 @@ class View:
         print()
         return choice
 
+    @staticmethod
     def prompt_for_player(self):
         infos = {
             "last_name": input("Nom : \n"),
@@ -46,36 +45,62 @@ class View:
         }
         return infos
 
+    @staticmethod
     def ask_new_player(self):
         answer = input("Ajouter un autre joueur ? (Y/N)\n").upper()
         while answer != "Y" and answer != "N":
             answer = input("Ajouter un autre joueur ? (Y/N)\n").upper()
         return True if answer == "Y" else False
 
+    @staticmethod
     def display_all_players(self, players):
         for player in players:
             player.show_infos()
 
+    @staticmethod
     def get_player_index(self):
         return int(input('Quel est le numéro du joueur ? \n'))
 
+    @staticmethod
     def get_new_rank(self):
         return int(input('Quel est le nouveau classement de ce joueur ? \n'))
 
+    @staticmethod
     def get_tournament_infos(self):
-        name = saisie_non_vide("Nom du tournoi :")
-        location = saisie_non_vide("Lieu du tournoi :")
+        name = non_empty_input("Nom du tournoi :")
+        location = non_empty_input("Lieu du tournoi :")
         # Vérifier la saisie valide d'une date
+        date = valid_date()
+        time_control = int(input(
+            """ 
+            Choisir le contrôle du temps :
+            1 - Blitz
+            2 - Bullet
+            3 - Coup rapide    
+            """
+        ))
+        while time_control != 1 and time_control != 2 and time_control != 3:
+            time_control = int(input(
+                """ 
+                Choisir le contrôle du temps :
+                1 - Blitz
+                2 - Bullet
+                3 - Coup rapide    
+                """
+            ))
+        print("Ajouter une description : ")
+        description = multiline_input()
 
         infos = {
             "name": name,
             "location": location,
-            "date": saisie_non_vide("Date :"),
-            "time_control": saisie_non_vide(f"Contrôle du temps :\n {tourna}  2 3 \n"),
-            "description": saisie_non_vide("Description :")
+            "date": date,
+            "time_control": time_control,
+            "description": description
         }
         return infos
 
+    @staticmethod
     def add_player(self, ids):
         pid = input("Numéro du joueur : \n")
         correct = True if pid in ids else False
@@ -85,6 +110,7 @@ class View:
             correct = True if pid in ids else False
         return pid
 
+    @staticmethod
     def ask_starting(self):
 
         answer = input(
@@ -106,7 +132,8 @@ class View:
             ).upper()
         return True if answer == "OUI" else False
 
-    def ask_ending_round(self):
+    @staticmethod
+    def ending_round(self):
         print("Tour en cours ... ")
         answer = input(
             "Quand le tour est terminé saisir 'FIN'.  \n"
@@ -116,6 +143,7 @@ class View:
                  "Quand le tour est terminé saisir 'FIN'.  \n"
             ).upper()
 
+    @staticmethod
     def ask_score(self, player_name):
         print(f"Quel est le score de {player_name}?")
         score = int(input(
@@ -128,6 +156,7 @@ class View:
             ))
         return score
 
+    @staticmethod
     def ask_continuing(self):
         answer = input(
             "Voulez-vous passer au tour suivant ? (Oui/Non)  \n"
@@ -137,7 +166,8 @@ class View:
                 "Voulez-vous passer au tour suivant ? (Oui/Non)  \n"
             ).upper()
         return True if answer == "OUI" else False
-    
+
+    @staticmethod
     def ask_round_name(self):
         round_name = input(
             "Quel est le nom du round ? \n"

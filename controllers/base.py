@@ -162,8 +162,8 @@ class Controller:
                     round_name = self.view.ask_round_name()
                     round = tournament.prepare_round_one(round_name)
                     tournament.add_round(round)
-                    # Demander si le tour est terminé
-                    self.view.ask_ending_round()
+                    # Terminer le tour
+                    self.view.ending_round()
                     # Saisir les scores
                     self.update_players_scores(tournament)
                     # Demander si on passe au tour suivant
