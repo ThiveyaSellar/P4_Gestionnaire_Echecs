@@ -4,7 +4,7 @@ from models.tools import non_empty_input, valid_date, multiline_input
 class View:
 
     @staticmethod
-    def display_main_menu(self):
+    def display_main_menu():
         menu = """
         ----- Menu principal -----
         
@@ -20,7 +20,7 @@ class View:
         return choice
 
     @staticmethod
-    def display_player_management_options(self):
+    def display_player_management_options():
         menu = """
         ----- Gestion des joueurs -----
         
@@ -35,7 +35,7 @@ class View:
         return choice
 
     @staticmethod
-    def prompt_for_player(self):
+    def prompt_for_player():
         infos = {
             "last_name": input("Nom : \n"),
             "first_name": input("Prénom: \n"),
@@ -46,38 +46,33 @@ class View:
         return infos
 
     @staticmethod
-    def ask_new_player(self):
+    def ask_new_player():
         answer = input("Ajouter un autre joueur ? (Y/N)\n").upper()
         while answer != "Y" and answer != "N":
             answer = input("Ajouter un autre joueur ? (Y/N)\n").upper()
         return True if answer == "Y" else False
 
     @staticmethod
-    def display_all_players(self, players):
+    def display_all_players(players):
         for player in players:
             player.show_infos()
 
     @staticmethod
-    def get_player_index(self):
+    def get_player_index():
         return int(input('Quel est le numéro du joueur ? \n'))
 
     @staticmethod
-    def get_new_rank(self):
+    def get_new_rank():
         return int(input('Quel est le nouveau classement de ce joueur ? \n'))
 
     @staticmethod
-    def get_tournament_infos(self):
+    def get_tournament_infos():
         name = non_empty_input("Nom du tournoi :")
         location = non_empty_input("Lieu du tournoi :")
         # Vérifier la saisie valide d'une date
         date = valid_date()
         time_control = int(input(
-            """ 
-            Choisir le contrôle du temps :
-            1 - Blitz
-            2 - Bullet
-            3 - Coup rapide    
-            """
+            "Contrôle du temps :\n1 - Blitz\n2 - Bullet\n3 - Coup rapide\n"
         ))
         while time_control != 1 and time_control != 2 and time_control != 3:
             time_control = int(input(
@@ -101,7 +96,7 @@ class View:
         return infos
 
     @staticmethod
-    def add_player(self, ids):
+    def add_player(ids):
         pid = input("Numéro du joueur : \n")
         correct = True if pid in ids else False
         while not correct:
@@ -111,7 +106,7 @@ class View:
         return pid
 
     @staticmethod
-    def ask_starting(self):
+    def ask_starting():
 
         answer = input(
             "Voulez-vous commencer le tournoi ? (Oui/Non)"
@@ -133,7 +128,7 @@ class View:
         return True if answer == "OUI" else False
 
     @staticmethod
-    def ending_round(self):
+    def ending_round():
         print("Tour en cours ... ")
         answer = input(
             "Quand le tour est terminé saisir 'FIN'.  \n"
@@ -144,7 +139,7 @@ class View:
             ).upper()
 
     @staticmethod
-    def ask_score(self, player_name):
+    def ask_score(player_name):
         print(f"Quel est le score de {player_name}?")
         score = int(input(
             f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
@@ -157,7 +152,7 @@ class View:
         return score
 
     @staticmethod
-    def ask_continuing(self):
+    def ask_continuing():
         answer = input(
             "Voulez-vous passer au tour suivant ? (Oui/Non)  \n"
         ).upper()
@@ -168,7 +163,7 @@ class View:
         return True if answer == "OUI" else False
 
     @staticmethod
-    def ask_round_name(self):
+    def ask_round_name():
         round_name = input(
             "Quel est le nom du round ? \n"
         )

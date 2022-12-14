@@ -189,8 +189,11 @@ class Tournament:
     def get_players(self):
         return self.players
 
-    def is_remaining_rounds(self):
+    def has_remaining_rounds(self):
         return True if self.remaining_rounds > 0 else False
+
+    def decrease_remaining_rounds(self):
+        self.remaining_rounds = self.remaining_rounds - 1
 
 '''
 

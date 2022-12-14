@@ -19,7 +19,7 @@ def valid_date():
     month = int(input("Saisir le mois :"))
     while month > 12 or month < 1:
         month = int(input("Saisir le mois : \n"))
-    day = int(input('Enter a day: '))
+    day = int(input('Saisir le jour : '))
     while day < 1 or day > 31:
         day = int(input("Saisir le jour : \n"))
     d = date(year, month, day)
