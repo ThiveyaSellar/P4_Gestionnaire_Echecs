@@ -167,14 +167,15 @@ class Controller:
                         round_name = self.view.ask_round_name()
                         # Créer le premier tour et afficher les matchs
                         round = tournament.prepare_round_one(round_name)
-                        # Ajouter le tour au tournoi
-                        tournament.add_round(round)
+                        round.show_status()
                         # Terminer le tour
                         self.view.ending_round()
+                        round.stop_round()
+                        round.show_status()
                         # Saisir les scores
                         self.update_players_scores(tournament)
-                        # Un tour en moins dans le tournoi
-                        tournament.decrease_remaining_rounds()
+                        # Ajouter le tour au tournoi
+                        tournament.add_round(round)
                         # Demander si on continue
                         play = self.view.ask_continuing()
 
@@ -183,15 +184,15 @@ class Controller:
                         round_name = self.view.ask_round_name()
                         # Créer le tour et afficher les matchs
                         round = tournament.prepare_next_round(round_name)
-                        # Ajouter le tour au tournoi
-                        tournament.add_round(round)
-                        # Demander si le tour est terminé
+                        round.show_status()
+                        # Terminer le tour
                         self.view.ending_round()
+                        round.stop_round()
+                        round.show_status()
                         # Saisir les scores
                         self.update_players_scores(tournament)
-
-                        # Un tour en moins dans le tournoi
-                        tournament.decrease_remaining_rounds()
+                        # Ajouter le tour au tournoi
+                        tournament.add_round(round)
                         # S'il reste des tours demander si on continue
                         if tournament.has_remaining_rounds():
                             play = self.view.ask_continuing()
@@ -203,7 +204,26 @@ class Controller:
                         print("Fin du tournoi")
 
                     # Enregistrer l'état du tournoi
-
+                    dict_tournament = tournament.__dict__
+                    s_rounds = []
+                    for r in tournament.rounds:
+                        dict_round = r.__dict__
+                        s_matchs = []
+                        for m in r.matchs:
+                            s_matchs.append(m.__dict__)
+                        dict_round['matchs'] = s_matchs
+                        s_rounds.append(r.__dict__)
+                    dict_tournament['rounds'] = s_rounds
+                    print(dict_tournament)
+                    '''serialized_tournament = {
+                        'name': tournament.name,
+                        'location': tournament.location,
+                        'date': tournament.date,
+                        'time_control': tournament.time_control,
+                        'description': tournament.description,
+                        'nb_rounds': tournament.nb_rounds,
+                        'remaining_rounds': tournament.remaining_rounds,
+                    }'''
 
                     '''    
                     # Premier round
@@ -233,9 +253,10 @@ class Controller:
                         print("Fin du tournoi")
                     '''
                 else:
+                    print("Tournoi en pause")
                     # Sauvegarder l'état du tournoi
+                    print(str(tournament))
                     # Retour au menu principal
-                    pass
             elif choice == 3:
                 # Reprendre le tournoi
                 print("Reprendre le tournoi")

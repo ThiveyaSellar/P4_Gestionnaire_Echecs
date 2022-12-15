@@ -69,26 +69,3 @@ class Player:
     def update_score(self, score):
         self.score = self.score + score
 
-'''
-print("------------------------ Test Player ---------------------------------")
-# Créer des joueurs
-playerA = Player("A", "", "15/12", "m", 100)
-playerB = Player("B", "", "16/12", "f", 10)
-playerC = Player("C", "", "23/10", "m", 34)
-
-# Afficher les joueurs
-print(str(playerA))
-print(str(playerB))
-
-# Changer le classement d'un joueur
-playerA.change_rank(105)
-playerB.change_rank(15)
-
-playerB.add_opponent(playerA)
-playerA.add_opponent(playerB)
-playerA.show_opponents()
-playerB.show_opponents()
-
-playerA.has_already_played_with(playerB)
-playerC.has_already_played_with(playerA)
-'''

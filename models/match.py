@@ -21,11 +21,3 @@ class Match:
 
     def show_infos(self):
         print(self.player_a.show_name() + " vs " + self.player_b.show_name())
-'''
-print("------------------------ Test Match ---------------------------------")
-match = Match("joueur1", "joueur2")
-print(match)
-match.add_score(1, 0)
-print(match)
-'''
-

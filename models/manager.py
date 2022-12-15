@@ -26,7 +26,7 @@ class Manager:
                 st["date"],
                 st["time_control"],
                 st["description"],
-                st["nb_turns"],
+                st["nb_rounds"],
             )
             tournaments.append(tournament)
         self.tournaments = tournaments

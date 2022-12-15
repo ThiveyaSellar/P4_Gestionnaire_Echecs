@@ -17,18 +17,22 @@ class Tournament:
         date,
         time_control,
         description,
-        nb_turns=4
+        nb_rounds=NB_ROUNDS
     ):
+        # Saisies par l'utilisateur
         self.name = name
         self.location = location
         self.date = date
-        self.nb_turns = nb_turns
-        self.rounds = []
-        self.players = []
         self.time_control = time_control
         self.description = description
-        self.ranking = []
+        # Valeur par défaut
+        self.nb_rounds = nb_rounds
         self.remaining_rounds = self.NB_ROUNDS
+        # Ajoutés au cours du tournoi
+        self.rounds = []
+        self.players = []
+        # Classement final saisi par le manager
+        self.ranking = []
 
     def __str__(self):
         return f"Tournoi {self.name} à {self.location} le {self.date}."
@@ -38,7 +42,7 @@ class Tournament:
 
     def add_player(self, player):
         self.players.append(player)
-        print(player.show_name() + " est ajouté au tournoi.")
+        print(player.show_name() + " est ajouté au tournoi. \n")
 
     def show_players(self):
         print("\nClassement provisoire des joueurs : ")
@@ -192,80 +196,3 @@ class Tournament:
     def has_remaining_rounds(self):
         return True if self.remaining_rounds > 0 else False
 
-    def decrease_remaining_rounds(self):
-        self.remaining_rounds = self.remaining_rounds - 1
-
-'''
-
-print("--------------- Tournament ---------------")
-tournoi = Tournament("Championnat", "Paris", "15/11", "blitz", "test")
-
-# Ajout de 8 joueurs au tournoi
-playerA = Player("A", "a", "", "f", 100)
-playerB = Player("B", "b", "", "m", 110)
-playerC = Player("C", "c", "", "f", 120)
-playerD = Player("D", "d", "", "m", 130)
-playerE = Player("E", "e", "", "f", 140)
-playerF = Player("F", "f", "", "m", 150)
-playerG = Player("G", "g", "", "f", 160)
-playerH = Player("H", "h", "", "m", 170)
-tournoi.add_player(playerA)
-tournoi.add_player(playerB)
-tournoi.add_player(playerC)
-tournoi.add_player(playerD)
-tournoi.add_player(playerE)
-tournoi.add_player(playerF)
-tournoi.add_player(playerG)
-tournoi.add_player(playerH)
-
-
-# Premier round
-tournoi.sort_players()
-tournoi.show_players()
-tournoi.add_round_one()
-playerA.update_score(1)
-playerB.update_score(0.5)
-playerC.update_score(0)
-playerD.update_score(0)
-playerE.update_score(0)
-playerF.update_score(0.5)
-playerG.update_score(1)
-playerH.update_score(1)
-
-# Deuxième round
-tournoi.sort_players()
-tournoi.show_players()
-tournoi.add_next_round("Round 2")
-playerA.update_score(0.5)
-playerB.update_score(0)
-playerC.update_score(0.5)
-playerD.update_score(0)
-playerE.update_score(1)
-playerF.update_score(0.5)
-playerG.update_score(0.5)
-playerH.update_score(1)
-
-tournoi.sort_players()
-tournoi.show_players()
-tournoi.add_next_round("Round 3")
-playerA.update_score(0)
-playerB.update_score(0.5)
-playerC.update_score(0.5)
-playerD.update_score(1)
-playerE.update_score(0.5)
-playerF.update_score(0)
-playerG.update_score(0.5)
-playerH.update_score(1)
-
-tournoi.sort_players()
-tournoi.show_players()
-tournoi.add_next_round("Round 4")
-
-tournoi.show_rounds()
-tournoi.show_rounds_and_matchs()
-
-
-
-
-
-'''

@@ -71,11 +71,11 @@ class View:
         location = non_empty_input("Lieu du tournoi :")
         # Vérifier la saisie valide d'une date
         date = valid_date()
-        time_control = int(input(
+        choice = int(input(
             "Contrôle du temps :\n1 - Blitz\n2 - Bullet\n3 - Coup rapide\n"
         ))
-        while time_control != 1 and time_control != 2 and time_control != 3:
-            time_control = int(input(
+        while choice != 1 and choice != 2 and choice != 3:
+            choice = int(input(
                 """ 
                 Choisir le contrôle du temps :
                 1 - Blitz
@@ -83,6 +83,12 @@ class View:
                 3 - Coup rapide    
                 """
             ))
+        if choice == 1:
+            time_control = "Blitz"
+        elif choice == 2:
+            time_control = "Bullet"
+        elif choice == 3:
+            time_control = "Coup rapide"
         print("Ajouter une description : ")
         description = multiline_input()
 
@@ -109,12 +115,12 @@ class View:
     def ask_starting():
 
         answer = input(
-            "Voulez-vous commencer le tournoi ? (Oui/Non)"
+            "Voulez-vous commencer le tournoi ? (Oui/Non)\n"
         ).upper()
         '''
         while True:
             answer = input(
-                "Voulez-vous commencer le tournoi ? (Y/N)"
+                "Voulez-vous commencer le tournoi ? (Y/N)\n"
             )
             if answer == 'Y':
                 break
@@ -123,7 +129,7 @@ class View:
         '''
         while answer != "OUI" and answer != "NON":
             answer = input(
-                "Voulez-vous commencer le tournoi ? (Oui/Non)"
+                "Voulez-vous commencer le tournoi ? (Oui/Non)\n"
             ).upper()
         return True if answer == "OUI" else False
 
@@ -141,12 +147,12 @@ class View:
     @staticmethod
     def ask_score(player_name):
         print(f"Quel est le score de {player_name}?")
-        score = int(input(
+        score = float(input(
             f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
         ))
-        while score != 1 and score != 0.5 and score != 0:
+        while score != 1.0 and score != 0.5 and score != 0.0:
             print(f"Quel est le score de {player_name}?")
-            score = int(input(
+            score =float(input(
                 f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
             ))
         return score
@@ -169,12 +175,3 @@ class View:
         )
         return round_name
 
-'''
-v = View()
-
-v.display_main_menu()
-v.display_player_management_options()
-infos = v.prompt_for_player()
-print(infos["last_name"])
-print(v.ask_new_player())
-'''

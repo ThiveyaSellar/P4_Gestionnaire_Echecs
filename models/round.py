@@ -10,12 +10,12 @@ class Round:
         self.end_date_time = ""
 
     def show_status(self):
-        print("Start time : ")
+        print("Début : ")
         print(self.start_date_time)
         if self.end_date_time == "":
             print("Le round est en cours.")
         else:
-            print("End time : ")
+            print("Fin : ")
             print(self.end_date_time)
 
     def add_match(self, match):
@@ -31,14 +31,4 @@ class Round:
     def show_name(self):
         return self.name
 
-'''
-print("------------------------ Test Round ---------------------------------")
-tour = Round("Round 1")
-scoreA = 1
-scoreB = 0
-match = (["joueurA", scoreA], ["joueur2", scoreB])
-tour.add_match(match)
-tour.show_status()
-tour.stop_round()
-tour.show_status()
-'''
+
