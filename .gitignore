@@ -1,1 +1,5 @@
 __pycache__
+chess_db.json
+db.json
+db.py
+.idea
