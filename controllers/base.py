@@ -55,6 +55,47 @@ class Controller:
         for sp in serialized_players:
             print(f"{sp.doc_id}     {sp['last_name']} {sp['first_name']} ({sp['rank']})")
 
+    def show_players_by_rank(self):
+        players_table = self.db.table('players')
+        serialized_players = players_table.all()  # À ordonner selon classement
+        players_list = []
+        for sp in serialized_players:
+            p = Player(
+                sp['last_name'],
+                sp['first_name'],
+                sp['birth_date'],
+                sp['gender'],
+                sp['rank']
+            )
+            players_list.append(p)
+        players_list.sort(key=lambda x: x.rank)
+        print("\nListe des joueurs par rang : ")
+        for n in range(len(players_list)):
+            print(f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()}", end=" ")
+        print("\n")
+
+    def show_players_by_name(self):
+        players_table = self.db.table('players')
+        serialized_players = players_table.all()  # À ordonner selon classement
+        players_list = []
+        for sp in serialized_players:
+            p = Player(
+                sp['last_name'],
+                sp['first_name'],
+                sp['birth_date'],
+                sp['gender'],
+                sp['rank']
+            )
+            players_list.append(p)
+        players_list = sorted(players_list, key=lambda x: (x.last_name, x.first_name))
+        print("\nListe des joueurs par ordre alphabétique : ")
+        for n in range(len(players_list)):
+            print(
+                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}",
+                end=" ")
+        print("\n")
+
+
     def show_players_to_add(self, id_list):
         for id in id_list:
             # Afficher le joueur dont l'id correspond
@@ -216,6 +257,54 @@ class Controller:
                                                 self.participant_list]}
         return tournament_data
 
+    def run_tournament(self, tournament):
+        # Le tournoi est en cours
+        play = True
+        # Si aucun tour a été joué lancé le tour 1
+        if tournament.remaining_rounds == tournament.NB_ROUNDS:
+            # Demander le nom du premier tour
+            round_name = self.view.ask_round_name()
+            # Créer le premier tour et afficher les matchs
+            round = tournament.prepare_round_one(round_name)
+            round.show_status()
+            # Terminer le tour
+            self.view.ending_round()
+            round.stop_round()
+            round.show_status()
+            # Saisir les scores
+            self.update_players_scores(tournament, round)
+            # Ajouter le tour au tournoi
+            tournament.add_round(round)
+            # Demander si on continue
+            play = self.view.ask_continuing()
+
+        while play and tournament.has_remaining_rounds():
+            # Demander le nom du round
+            round_name = self.view.ask_round_name()
+            # Créer le tour et afficher les matchs
+            round = tournament.prepare_next_round(round_name)
+            round.show_status()
+            # Terminer le tour
+            self.view.ending_round()
+            round.stop_round()
+            round.show_status()
+            # Saisir les scores
+            self.update_players_scores(tournament, round)
+            # Ajouter le tour au tournoi
+            tournament.add_round(round)
+            # S'il reste des tours demander si on continue
+            if tournament.has_remaining_rounds():
+                play = self.view.ask_continuing()
+
+        # Afficher le statut
+        if not play and tournament.has_remaining_rounds():
+            print("Tournoi en pause")
+        elif not tournament.has_remaining_rounds():
+            print("Fin du tournoi")
+
+        # Enregistrer l'état du tournoi
+        self.save_tournament(tournament)
+
     def run(self):
         running = True
         while running:
@@ -251,54 +340,7 @@ class Controller:
                 start = self.view.ask_starting()
                 # Si oui commence sinon retour au menu principal
                 if start:
-                    # Le tournoi est en cours
-                    play = True
-                    # Si aucun tour a été joué lancé le tour 1
-                    if tournament.remaining_rounds == tournament.NB_ROUNDS:
-                        # self.first_round()
-                        # Demander le nom du premier tour
-                        round_name = self.view.ask_round_name()
-                        # Créer le premier tour et afficher les matchs
-                        round = tournament.prepare_round_one(round_name)
-                        round.show_status()
-                        # Terminer le tour
-                        self.view.ending_round()
-                        round.stop_round()
-                        round.show_status()
-                        # Saisir les scores
-                        self.update_players_scores(tournament, round)
-                        # Ajouter le tour au tournoi
-                        tournament.add_round(round)
-                        # Demander si on continue
-                        play = self.view.ask_continuing()
-
-                    while play and tournament.has_remaining_rounds():
-                        # Demander le nom du round
-                        round_name = self.view.ask_round_name()
-                        # Créer le tour et afficher les matchs
-                        round = tournament.prepare_next_round(round_name)
-                        round.show_status()
-                        # Terminer le tour
-                        self.view.ending_round()
-                        round.stop_round()
-                        round.show_status()
-                        # Saisir les scores
-                        self.update_players_scores(tournament, round)
-                        # Ajouter le tour au tournoi
-                        tournament.add_round(round)
-                        # S'il reste des tours demander si on continue
-                        if tournament.has_remaining_rounds():
-                            play = self.view.ask_continuing()
-
-                    # Afficher le statut
-                    if not play and tournament.has_remaining_rounds():
-                        print("Tournoi en pause")
-                    elif not tournament.has_remaining_rounds():
-                        print("Fin du tournoi")
-
-                    # Enregistrer l'état du tournoi
-                    self.save_tournament(tournament)
-
+                    self.run_tournament(tournament)
                     '''    
                     # Premier round
                     round_name = self.view.ask_round_name()
@@ -345,7 +387,6 @@ class Controller:
                 self.show_tournaments(tournaments_id)
                 # Demander l'id du tournoi
                 t_id = self.view.choose_tournament(tournaments_id)
-                # Créer le joueur et l'ajouter au tournoi grâce à l'id
                 t_id = int(t_id)
                 rounds = []
                 for round in tournaments[t_id - 1]['rounds']:
@@ -367,11 +408,30 @@ class Controller:
                     )
                 print(tournament)
                 # Continuer
-
-
+                self.run_tournament(tournament)
             elif choice == 4:
                 # Liste de rapports
                 print("Liste des rapports")
+                """
+                Rapports :
+
+                • Liste de tous les acteurs:
+                    ◦ par ordre alphabétique
+                    ◦ par classement.
+                • Liste de tous les joueurs d'un tournoi:
+                    ◦ par ordre alphabétique
+                    ◦ par classement.
+                • Liste de tous les tournois.
+                • Liste de tous les tours d'un tournoi.
+                • Liste de tous les matchs d'un tournoi.
+
+                """
+                selection = self.view.select_report()
+                if selection == 1:
+                    self.show_players_by_name()
+                elif selection == 2:
+                    self.show_players_by_rank()
+
             elif choice == 5:
                 # Quitter
                 running = False

@@ -205,3 +205,48 @@ class View:
         )
         return round_name
 
+    @staticmethod
+    def select_report():
+        """
+        Rapports :
+        • Liste de tous les acteurs :
+            ◦ par ordre alphabétique 
+            ◦ par classement.
+        • Liste de tous les joueurs d'un tournoi :
+            ◦ par ordre alphabétique 
+            ◦ par classement.
+        • Liste de tous les tournois.
+        • Liste de tous les tours d'un tournoi.
+        • Liste de tous les matchs d'un tournoi.
+        :return:
+        """
+        choice = input(
+            """ 
+            Rapports :
+            * Acteurs :
+                1) par ordre alphabétique
+                2) par classement
+            * Joueurs d'un tournoi :
+                3) par ordre alphabétique
+                4) par classement
+            5) Tournois
+            6) Tours d'un tournoi
+            7) Matchs d'un tournoi    
+            """
+        )
+        while int(choice) <= 0 or int(choice) >= 8 or type(choice) == str:
+            choice = input(
+                """ 
+                Rapports :
+                * Acteurs :
+                    1) par ordre alphabétique
+                    2) par classement
+                * Joueurs d'un tournoi :
+                    3) par ordre alphabétique
+                    4) par classement
+                5) Tournois
+                6) Tours d'un tournoi
+                7) Matchs d'un tournoi    
+                """
+            )
+        return int(choice)

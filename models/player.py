@@ -15,6 +15,9 @@ class Player:
     def get_last_name(self):
         return self.last_name
 
+    def get_rank(self):
+        return self.rank
+
     """def __repr__(self):
         return str(self)"""
 
