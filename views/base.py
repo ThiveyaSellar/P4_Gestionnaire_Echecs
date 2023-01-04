@@ -112,6 +112,16 @@ class View:
         return pid
 
     @staticmethod
+    def choose_tournament(ids):
+        tid = input("Numéro du tournoi : \n")
+        correct = True if tid in ids else False
+        while not correct:
+            print("Numéro non présent dans la liste. \n")
+            pid = input("Numéro du tournoi : \n")
+            correct = True if tid in ids else False
+        return tid
+
+    @staticmethod
     def ask_starting():
 
         answer = input(
@@ -152,10 +162,30 @@ class View:
         ))
         while score != 1.0 and score != 0.5 and score != 0.0:
             print(f"Quel est le score de {player_name}?")
-            score =float(input(
+            score = float(input(
                 f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
             ))
         return score
+
+    @staticmethod
+    def get_scores(name_a, name_b):
+        print(f"Quel est le score de {name_a}?")
+        score_a = float(input(
+            f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+        ))
+        while score_a != 1.0 and score_a != 0.5 and score_a != 0.0:
+            print(f"Quel est le score de {name_a}?")
+            score_a = float(input(
+                f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+            ))
+        if score_a == 1:
+            score_b = 0
+        elif score_a == 0.5:
+            score_b = 0.5
+        elif score_a == 0:
+            score_b = 1
+        print(f"Le score de {name_b} est {score_b}. \n")
+        return [score_a, score_b]
 
     @staticmethod
     def ask_continuing():

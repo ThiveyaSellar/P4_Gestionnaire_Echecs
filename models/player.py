@@ -1,16 +1,22 @@
 class Player:
 
-    def __init__(self, last_name, first_name, birth_date, gender, rank):
+    def __init__(self, last_name, first_name, birth_date, gender, rank, opponents=[]):
         self.last_name = last_name
         self.first_name = first_name
         self.birth_date = birth_date
         self.gender = gender
         self.rank = rank
         self.score = 0
-        self.opponents = []
+        self.opponents = opponents
 
-    def __str__(self):
-        return f"{self.last_name}"
+    """def __str__(self):
+        return f"{self.last_name}"""
+
+    def get_last_name(self):
+        return self.last_name
+
+    """def __repr__(self):
+        return str(self)"""
 
     def show_full_infos(self):
         if self.gender.lower() == "f":
@@ -28,9 +34,6 @@ class Player:
     def get_name(self):
         return self.last_name + " " + self.first_name
 
-    def __repr__(self):
-        return str(self)
-
     # Changer le classement du joueur
     def change_rank(self, new_rank):
         if new_rank > 0:
@@ -40,7 +43,7 @@ class Player:
             print("Le classement doit être strictement positif.")
 
     def add_opponent(self, player):
-        self.opponents.append(player)
+        self.opponents.append(player.rank)
 
     def show_opponents(self):
         for opponent in self.opponents:
@@ -50,7 +53,7 @@ class Player:
         return self.last_name
 
     def has_already_played_with(self, player):
-        return player in self.opponents
+        return player.rank in self.opponents
 
     def has_already_played_with2(self, player):
         if player in self.opponents:
@@ -68,4 +71,35 @@ class Player:
 
     def update_score(self, score):
         self.score = self.score + score
+
+    def serialize(self):
+        player = {
+            "last_name" : self.last_name,
+            "first_name" :self.first_name,
+            "birth_date" : self.birth_date,
+            "gender" : self.gender,
+            "rank" : self.rank,
+            "score" : self.score,
+            "opponents":self.opponents
+        }
+        return player
+
+    @staticmethod
+    def deserialize_player(serialized_player):
+        last_name = serialized_player["last_name"]
+        first_name = serialized_player["first_name"]
+        birth_date = serialized_player["birth_date"]
+        gender = serialized_player["gender"]
+        rank = serialized_player["rank"]
+        opponents = serialized_player["opponents"]
+
+        player = Player(
+            last_name,
+            first_name,
+            birth_date,
+            gender,
+            rank,
+            opponents,
+        )
+        return player
 

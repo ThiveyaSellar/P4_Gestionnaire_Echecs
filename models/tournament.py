@@ -17,7 +17,11 @@ class Tournament:
         date,
         time_control,
         description,
-        nb_rounds=NB_ROUNDS
+        nb_rounds=NB_ROUNDS,
+        remaining_rounds=NB_ROUNDS,
+        rounds=[],
+        players=[],
+        ranking=[]
     ):
         # Saisies par l'utilisateur
         self.name = name
@@ -27,12 +31,12 @@ class Tournament:
         self.description = description
         # Valeur par défaut
         self.nb_rounds = nb_rounds
-        self.remaining_rounds = self.NB_ROUNDS
+        self.remaining_rounds = remaining_rounds
         # Ajoutés au cours du tournoi
-        self.rounds = []
-        self.players = []
+        self.rounds = rounds
+        self.players = players
         # Classement final saisi par le manager
-        self.ranking = []
+        self.ranking = ranking
 
     def __str__(self):
         return f"Tournoi {self.name} à {self.location} le {self.date}."
@@ -47,7 +51,7 @@ class Tournament:
     def show_players(self):
         print("\nClassement provisoire des joueurs : ")
         for n in range(len(self.players)):
-            print(self.players[n], end=" ")
+            print(self.players[n].get_last_name(), end=" ")
         print("\n")
 
     def sort_players(self):

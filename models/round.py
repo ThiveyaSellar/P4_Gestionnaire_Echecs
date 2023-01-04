@@ -1,13 +1,13 @@
 from datetime import datetime
-
+from models.match import Match
 
 class Round:
 
-    def __init__(self, name):
+    def __init__(self, name, matchs=[], start_date_time=datetime.now().strftime("%d/%m/%Y à %H:%M"),end_date_time = ""):
         self.name = name
-        self.matchs = []
-        self.start_date_time = datetime.now().strftime("%d/%m/%Y à %H:%M")
-        self.end_date_time = ""
+        self.matchs = matchs
+        self.start_date_time = start_date_time
+        self.end_date_time = end_date_time
 
     def show_status(self):
         print("Début : ")
@@ -30,5 +30,31 @@ class Round:
 
     def show_name(self):
         return self.name
+
+    def serialize(self):
+        serialized_matchs = []
+        for match in self.matchs:
+            serialized_matchs.append(match.serialize())
+
+        round = {
+            'name': self.name,
+            'matchs': serialized_matchs,
+            'start_date_time': self.start_date_time,
+            'end_date_time': self.end_date_time
+        }
+
+        return round
+
+    @staticmethod
+    def deserialize_round(serialized_round):
+        name = serialized_round['name']
+        matchs = []
+        for match in serialized_round['matchs']:
+            matchs.append(Match.deserialize_match(match))
+        start_date_time = serialized_round['start_date_time']
+        end_date_time = serialized_round['end_date_time']
+
+        round = Round(name, matchs, start_date_time, end_date_time)
+        return round
 
 
