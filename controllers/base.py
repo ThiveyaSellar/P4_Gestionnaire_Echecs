@@ -181,81 +181,16 @@ class Controller:
             match.player_a.update_score(scores[0])
             match.player_b.update_score(scores[1])
 
-    def save_tournament(self, tournament):
-        dict_tournament = tournament.__dict__
-        s_rounds = []
-        for r in tournament.rounds:
-            dict_round = r.__dict__
-            s_matchs = []
-            for m in r.matchs:
-                dict_match = m.__dict__
-                dict_match['player_a'] = \
-                    dict_match['player_a'].__dict__
-                dict_match['player_b'] = \
-                    dict_match['player_b'].__dict__
-                s_matchs.append(dict_match)
-            dict_round['matchs'] = s_matchs
-            s_rounds.append(r.__dict__)
-        dict_tournament['rounds'] = s_rounds
-        s_players = []
-        for p in tournament.players:
-            dict_player = p.__dict__
-            s_players.append(dict_player)
-        dict_tournament['players'] = s_players
-        dict_tournament['date'] = str(dict_tournament['date'])
-        pprint.pprint(dict_tournament)
-        serialized_tournament = dict_tournament
+    def save_tournament(self, tournament, tournament_id=None):
+        serialized_tournament = tournament.serialize()
         tournament_table = self.db.table('tournaments')
-        tournament_table.insert(dict_tournament)
-
-    @staticmethod
-    def deserialize_tournament(serialized_tournament: dict) -> 'Tournament':
-        """
-        :param serialized_tournament: Takes a Tournament dict with all key,
-               value information
-        :return: Returns an object of Tournament class
-        """
-        id = serialized_tournament['id']
-        name = serialized_tournament["name"]
-        venue = serialized_tournament["venue"]
-        date = serialized_tournament["date"]
-        number_of_rounds = serialized_tournament["number_of_rounds"]
-        time_control = serialized_tournament["time_control"]
-        description = serialized_tournament["description"]
-        list_of_rounds = [Round.deserialize_round(round_dict) for round_dict in
-                          serialized_tournament["list_of_rounds"]]
-        participant_list = [Player.deserialize(player_dict) for player_dict in
-                            serialized_tournament["participant_list"]]
-        participant_score = serialized_tournament["participant_score"]
-        return Tournament(id,
-                          name,
-                          venue,
-                          date,
-                          number_of_rounds,
-                          time_control,
-                          description,
-                          list_of_rounds,
-                          participant_score,
-                          participant_list)
-
-    def serialize(self) -> dict:
-        """
-        :return: Returns a dict with all Tournament key, value information
-        """
-        tournament_data = {'id': self.id,
-                           'name': self.name,
-                           'venue': self.venue,
-                           'date': self.date,
-                           'number_of_rounds': self.number_of_rounds,
-                           'time_control': self.time_control,
-                           'description': self.description,
-                           'list_of_rounds': [round.serialize() for round in
-                                              self.list_of_rounds],
-                           'participant_score': self.participant_score,
-                           'participant_list': [player.serialize() for player
-                                                in
-                                                self.participant_list]}
-        return tournament_data
+        if tournament_id is None:
+            tournament_table.insert(serialized_tournament)
+        else:
+            # Supprimer la ligne qui a l'id
+            item = tournament_table.update({str(tournament_id) : serialized_tournament}, doc_ids=[tournament_id])
+            # Ajouter une nouvelle ligne
+            # tournament_table.upsert(serialized_tournament, tournament_id)
 
     def run_tournament(self, tournament):
         # Le tournoi est en cours
@@ -302,8 +237,6 @@ class Controller:
         elif not tournament.has_remaining_rounds():
             print("Fin du tournoi")
 
-        # Enregistrer l'état du tournoi
-        self.save_tournament(tournament)
 
     def run(self):
         running = True
@@ -368,6 +301,8 @@ class Controller:
                     else:
                         print("Fin du tournoi")
                     '''
+                    # Enregistrer l'état du tournoi
+                    self.save_tournament(tournament)
                 else:
                     print("Tournoi en pause")
                     # Sauvegarder l'état du tournoi
@@ -379,36 +314,40 @@ class Controller:
                 # Récupérer les tournois dans la base de données
                 # Afficher les tournois avec leurs ids
                 tournaments = self.db.table('tournaments').all()
-                tournaments_id = []
-                # Récupérer tous les id
-                for t in tournaments:
-                    tournaments_id.append(str(t.doc_id))
-                # Montrer les tournois
-                self.show_tournaments(tournaments_id)
-                # Demander l'id du tournoi
-                t_id = self.view.choose_tournament(tournaments_id)
-                t_id = int(t_id)
-                rounds = []
-                for round in tournaments[t_id - 1]['rounds']:
-                    rounds.append(Round.deserialize_round(round))
-                players = []
-                for player in tournaments[t_id - 1]['players']:
-                    players.append(Player.deserialize_player(player))
-                tournament = Tournament(
-                        tournaments[t_id - 1]['name'],
-                        tournaments[t_id - 1]['location'],
-                        tournaments[t_id - 1]['date'],
-                        tournaments[t_id - 1]['time_control'],
-                        tournaments[t_id - 1]['description'],
-                        int(tournaments[t_id - 1]['nb_rounds']),
-                        int(tournaments[t_id - 1]['remaining_rounds']),
-                        rounds,
-                        players,
-                        tournaments[t_id - 1]['ranking']
-                    )
-                print(tournament)
-                # Continuer
-                self.run_tournament(tournament)
+                if len(tournaments) != 0:
+                    tournaments_id = []
+                    # Récupérer tous les id
+                    for t in tournaments:
+                        tournaments_id.append(str(t.doc_id))
+                    # Montrer les tournois
+                    self.show_tournaments(tournaments_id)
+                    # Demander l'id du tournoi
+                    t_id = self.view.choose_tournament(tournaments_id)
+                    t_id = int(t_id)
+                    rounds = []
+                    for round in tournaments[t_id - 1]['rounds']:
+                        rounds.append(Round.deserialize_round(round))
+                    players = []
+                    for player in tournaments[t_id - 1]['players']:
+                        players.append(Player.deserialize_player(player))
+                    tournament = Tournament(
+                            tournaments[t_id - 1]['name'],
+                            tournaments[t_id - 1]['location'],
+                            tournaments[t_id - 1]['date'],
+                            tournaments[t_id - 1]['time_control'],
+                            tournaments[t_id - 1]['description'],
+                            int(tournaments[t_id - 1]['nb_rounds']),
+                            int(tournaments[t_id - 1]['remaining_rounds']),
+                            rounds,
+                            players,
+                            tournaments[t_id - 1]['ranking']
+                        )
+                    print(tournament)
+                    # Continuer
+                    self.run_tournament(tournament)
+                    self.save_tournament(tournament, t_id)
+                else:
+                    print("Aucun tournoi en cours ...")
             elif choice == 4:
                 # Liste de rapports
                 print("Liste des rapports")

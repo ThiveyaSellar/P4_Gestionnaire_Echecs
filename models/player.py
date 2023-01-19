@@ -1,13 +1,13 @@
 class Player:
 
-    def __init__(self, last_name, first_name, birth_date, gender, rank, opponents=[]):
+    def __init__(self, last_name, first_name, birth_date, gender, rank):
         self.last_name = last_name
         self.first_name = first_name
         self.birth_date = birth_date
         self.gender = gender
         self.rank = rank
         self.score = 0
-        self.opponents = opponents
+        self.opponents = []
 
     """def __str__(self):
         return f"{self.last_name}"""
@@ -47,6 +47,9 @@ class Player:
 
     def add_opponent(self, player):
         self.opponents.append(player.rank)
+
+    def add_opponent_in_deserialize(self, rank):
+        self.opponents.append(rank)
 
     def show_opponents(self):
         for opponent in self.opponents:
@@ -102,7 +105,11 @@ class Player:
             birth_date,
             gender,
             rank,
-            opponents,
         )
+
+        print(opponents)
+        for o in opponents:
+            player.add_opponent_in_deserialize(o)
+
         return player
 

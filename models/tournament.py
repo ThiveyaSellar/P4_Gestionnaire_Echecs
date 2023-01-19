@@ -1,6 +1,10 @@
-from models.round import Round
+'''from models.round import Round
+from models.match import Match
+from models.player import Player'''
+
 from models.match import Match
 from models.player import Player
+from models.round import Round
 
 TIME = ("blitz", "bullet", "coup rapide")
 
@@ -200,3 +204,75 @@ class Tournament:
     def has_remaining_rounds(self):
         return True if self.remaining_rounds > 0 else False
 
+    def serialize(self):
+        rounds = []
+        for r in self.rounds:
+            rounds.append(r.serialize())
+        players = []
+        for p in self.players:
+            players.append(p.serialize())
+
+        tournament = {
+            "name": self.name,
+            "location": self.location,
+            "date": str(self.date),
+            "time_control": self.time_control,
+            "description": self.description,
+            "nb_rounds": self.nb_rounds,
+            "remaining_rounds": self.remaining_rounds,
+            "rounds": rounds,
+            "players": players,
+            "ranking": self.ranking
+        }
+        return tournament
+
+    @staticmethod
+    def deserialize_tournament(serialized_tournament):
+        name = serialized_tournament["name"]
+        location = serialized_tournament["location"]
+        date = serialized_tournament["date"]
+        time_control = serialized_tournament["time_control"]
+        description = serialized_tournament["description"]
+        nb_rounds = serialized_tournament["nb_rounds"]
+        remaining_rounds = serialized_tournament["remaining_rounds"]
+        rounds = []
+        for r in serialized_tournament["rounds"]:
+            rounds.append(Round.deserialize_round(r))
+        players = []
+        for p in serialized_tournament["players"]:
+            players.append(Player.deserialize_player(p))
+        ranking = serialized_tournament["ranking"]
+
+        tournament = Tournament(
+            name,
+            location,
+            date,
+            time_control,
+            description,
+            nb_rounds,
+            remaining_rounds,
+            rounds,
+            players,
+            ranking
+        )
+
+        return tournament
+
+
+'''tr = Tournament("test","location","date","time","des")
+playerA = Player("a","a","datenais","f",10)
+playerB = Player("b","b","datenais","f",10)
+tr.add_player(playerA)
+tr.add_player(playerB)
+
+round = Round('test')
+round2 = Round('toast')
+tr.add_round(round)
+tr.add_round(round2)
+a = tr.serialize()
+print('---------------------------------------------')
+print(a)
+
+print('---------------------------------------------')
+b = Tournament.deserialize_tournament(a)
+print(b.rounds)'''

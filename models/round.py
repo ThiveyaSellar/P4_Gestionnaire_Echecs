@@ -56,5 +56,3 @@ class Round:
 
         round = Round(name, matchs, start_date_time, end_date_time)
         return round
-
-
