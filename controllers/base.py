@@ -182,15 +182,17 @@ class Controller:
             match.player_b.update_score(scores[1])
 
     def save_tournament(self, tournament, tournament_id=None):
+        # Sérialiser le tournoi pour l'insertion dans TinyDB
         serialized_tournament = tournament.serialize()
+        # Récupérer la table tournoi
         tournament_table = self.db.table('tournaments')
+        # S'il n'y a pas de id associé au tournoi
+        # Il n'existe pas et donc on l'insère
+        # Sinon on update
         if tournament_id is None:
             tournament_table.insert(serialized_tournament)
         else:
-            # Supprimer la ligne qui a l'id
-            item = tournament_table.update({str(tournament_id) : serialized_tournament}, doc_ids=[tournament_id])
-            # Ajouter une nouvelle ligne
-            # tournament_table.upsert(serialized_tournament, tournament_id)
+            item = tournament_table.update({str(tournament_id) : "serialized_tournament"}, doc_ids=[tournament_id])
 
     def run_tournament(self, tournament):
         # Le tournoi est en cours

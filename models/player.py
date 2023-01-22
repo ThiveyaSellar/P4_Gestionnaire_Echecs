@@ -97,6 +97,7 @@ class Player:
         birth_date = serialized_player["birth_date"]
         gender = serialized_player["gender"]
         rank = serialized_player["rank"]
+        score = serialized_player["score"]
         opponents = serialized_player["opponents"]
 
         player = Player(
@@ -104,9 +105,10 @@ class Player:
             first_name,
             birth_date,
             gender,
-            rank,
+            rank
         )
 
+        player.update_score(score)
         print(opponents)
         for o in opponents:
             player.add_opponent_in_deserialize(o)

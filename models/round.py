@@ -3,9 +3,9 @@ from models.match import Match
 
 class Round:
 
-    def __init__(self, name, matchs=[], start_date_time=datetime.now().strftime("%d/%m/%Y à %H:%M"),end_date_time = ""):
+    def __init__(self, name, start_date_time=datetime.now().strftime("%d/%m/%Y à %H:%M"),end_date_time = ""):
         self.name = name
-        self.matchs = matchs
+        self.matchs = []
         self.start_date_time = start_date_time
         self.end_date_time = end_date_time
 
@@ -48,11 +48,10 @@ class Round:
     @staticmethod
     def deserialize_round(serialized_round):
         name = serialized_round['name']
-        matchs = []
-        for match in serialized_round['matchs']:
-            matchs.append(Match.deserialize_match(match))
         start_date_time = serialized_round['start_date_time']
         end_date_time = serialized_round['end_date_time']
 
-        round = Round(name, matchs, start_date_time, end_date_time)
+        round = Round(name, start_date_time, end_date_time)
+        for match in serialized_round['matchs']:
+            round.add_match(Match.deserialize_match(match))
         return round
