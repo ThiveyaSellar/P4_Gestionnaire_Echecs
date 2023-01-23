@@ -112,13 +112,14 @@ class View:
         return pid
 
     @staticmethod
-    def choose_tournament(ids):
+    def choose_tournament(nbtournaments):
         tid = input("Numéro du tournoi : \n")
-        correct = True if tid in ids else False
+        # correct = True if tid in ids else False
+        correct = True if (nbtournaments >= int(tid) >= 1) else False
         while not correct:
             print("Numéro non présent dans la liste. \n")
             pid = input("Numéro du tournoi : \n")
-            correct = True if tid in ids else False
+            correct = True if (nbtournaments >= int(tid) >= 1) else False
         return tid
 
     @staticmethod

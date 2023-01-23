@@ -1,7 +1,7 @@
-import db
-import pprint
+# import db
+# import pprint
 from models.tournament import Tournament
-from models.match import Match
+# from models.match import Match
 from models.round import Round
 from models.player import Player
 
@@ -110,16 +110,19 @@ class Controller:
         print()
 
     def show_tournaments(self, id_list):
+        i = 1
         for id in id_list:
             # Afficher le tournoi dont l'id correspond
             tournaments_table = self.db.table('tournaments')
             t = tournaments_table.get(doc_id=id)
             print(
-                f"{t.doc_id}    "
+                # f"{t.doc_id}    "
+                f"{i}    "
                 f"{t['name']} "
                 f"{t['date']} "
                 f"{t['location']} "
             )
+            i = i + 1
         print()
 
     def update_player_rank(self):
@@ -192,7 +195,9 @@ class Controller:
         if tournament_id is None:
             tournament_table.insert(serialized_tournament)
         else:
-            item = tournament_table.update({str(tournament_id) : "serialized_tournament"}, doc_ids=[tournament_id])
+            # item = tournament_table.update({str(tournament_id) : "serialized_tournament"}, doc_ids=[tournament_id])
+            tournament_table.remove(doc_ids=[tournament_id])
+            tournament_table.insert(serialized_tournament)
 
     def run_tournament(self, tournament):
         # Le tournoi est en cours
@@ -324,7 +329,7 @@ class Controller:
                     # Montrer les tournois
                     self.show_tournaments(tournaments_id)
                     # Demander l'id du tournoi
-                    t_id = self.view.choose_tournament(tournaments_id)
+                    t_id = self.view.choose_tournament(len(tournaments_id))
                     t_id = int(t_id)
                     rounds = []
                     for round in tournaments[t_id - 1]['rounds']:

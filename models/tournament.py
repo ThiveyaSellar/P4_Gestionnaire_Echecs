@@ -43,7 +43,7 @@ class Tournament:
         self.ranking = ranking
 
     def __str__(self):
-        return f"Tournoi {self.name} à {self.location} le {self.date}."
+        return f"Tournoi {self.name} a {self.location} le {self.date}."
 
     def __repr__(self):
         return str(self)
