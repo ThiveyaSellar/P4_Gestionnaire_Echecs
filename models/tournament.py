@@ -53,7 +53,7 @@ class Tournament:
         print(player.show_name() + " est ajouté au tournoi. \n")
 
     def show_players(self):
-        print("\nClassement provisoire des joueurs : ")
+        print("\nClassement des joueurs : ")
         for n in range(len(self.players)):
             print(self.players[n].get_last_name(), end=" ")
         print("\n")
@@ -201,6 +201,9 @@ class Tournament:
     def get_players(self):
         return self.players
 
+    def get_players_size(self):
+        return len(self.players)
+
     def has_remaining_rounds(self):
         return True if self.remaining_rounds > 0 else False
 
@@ -257,6 +260,11 @@ class Tournament:
         )
 
         return tournament
+
+    def clear_all(self):
+        self.players.clear()
+        self.rounds.clear()
+        self.ranking.clear()
 
 
 '''tr = Tournament("test","location","date","time","des")

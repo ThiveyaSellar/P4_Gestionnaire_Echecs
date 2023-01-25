@@ -112,14 +112,28 @@ class View:
         return pid
 
     @staticmethod
-    def choose_tournament(nbtournaments):
-        tid = input("Numéro du tournoi : \n")
+    def choose_tournament(tournaments_id):
+        nb_tournaments = len(tournaments_id)
+        # Création d'une liste de tuple
+        # Associant l'indice affiché du tournoi avec le doc_id du tournoi
+        correspondances = []
+        for nb in range(nb_tournaments):
+            correspondances.append((nb+1, tournaments_id[nb]))
+
+        # Demander l'indice et vérifier la saisie
+        choice = input("Numéro du tournoi : \n")
         # correct = True if tid in ids else False
-        correct = True if (nbtournaments >= int(tid) >= 1) else False
+        correct = True if (nb_tournaments >= int(choice) >= 1) else False
         while not correct:
             print("Numéro non présent dans la liste. \n")
-            pid = input("Numéro du tournoi : \n")
-            correct = True if (nbtournaments >= int(tid) >= 1) else False
+            choice = input("Numéro du tournoi : \n")
+            correct = True if (nb_tournaments >= int(choice) >= 1) else False
+
+        # Récupérer le doc_id associé à l'indice choisi
+        for c in correspondances:
+            if c[0] == int(choice):
+                tid = c[1]
+                break
         return tid
 
     @staticmethod
@@ -208,19 +222,6 @@ class View:
 
     @staticmethod
     def select_report():
-        """
-        Rapports :
-        • Liste de tous les acteurs :
-            ◦ par ordre alphabétique 
-            ◦ par classement.
-        • Liste de tous les joueurs d'un tournoi :
-            ◦ par ordre alphabétique 
-            ◦ par classement.
-        • Liste de tous les tournois.
-        • Liste de tous les tours d'un tournoi.
-        • Liste de tous les matchs d'un tournoi.
-        :return:
-        """
         choice = input(
             """ 
             Rapports :
@@ -235,7 +236,7 @@ class View:
             7) Matchs d'un tournoi    
             """
         )
-        while int(choice) <= 0 or int(choice) >= 8 or type(choice) == str:
+        while int(choice) <= 0 or int(choice) >= 8:
             choice = input(
                 """ 
                 Rapports :
@@ -251,3 +252,15 @@ class View:
                 """
             )
         return int(choice)
+
+    @staticmethod
+    def end_tournament(tournament):
+        print("Fin du tournoi")
+        tournament.show_players()
+        # MAJ manuelle du classement des joueurs
+        print("Quel est le classement final ?")
+        ranking = []
+        for size in range(tournament.get_players_size()):
+            player = input("Saisir un joueur")
+            ranking.append(player)
+        return ranking
