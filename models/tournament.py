@@ -23,6 +23,7 @@ class Tournament:
         description,
         nb_rounds=NB_ROUNDS,
         remaining_rounds=NB_ROUNDS,
+        finished=False,
         rounds=[],
         players=[],
         ranking=[]
@@ -36,6 +37,8 @@ class Tournament:
         # Valeur par défaut
         self.nb_rounds = nb_rounds
         self.remaining_rounds = remaining_rounds
+        # Modifié quand le tournoi est terminé
+        self.finished = finished
         # Ajoutés au cours du tournoi
         self.rounds = rounds
         self.players = players
@@ -173,7 +176,7 @@ class Tournament:
         return round
 
     def show_rounds(self):
-        print("Liste de tous les tours d'un tournoi")
+        print("Liste de tous les tours :")
         for round in self.rounds:
             print(round.show_status())
 
@@ -182,10 +185,12 @@ class Tournament:
         for round in self.rounds:
             print(round.show_name() + ":")
             round.show_matchs()
+            print("\n")
 
     def update_ranking(self, ranking):
         self.ranking = ranking
 
+    '''
     def show_players_by_ranking(self):
         players = sorted(self.players, key=lambda x: x.rank)
         for player in players:
@@ -197,6 +202,32 @@ class Tournament:
         for player in players:
             print(player.show_name(), end=" ")
         print()
+    '''
+
+    def show_players_by_name(self):
+        players_list = sorted(
+            self.players,
+            key=lambda x: (x.last_name, x.first_name)
+        )
+        print("\nListe des joueurs par ordre alphabétique : ")
+        for n in range(len(players_list)):
+            print(
+                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n", end = ""
+            )
+        print("\n")
+
+    def show_players_by_ranking(self):
+        players_list = sorted(
+            self.players,
+            key=lambda x: x.rank
+        )
+        print("\nListe des joueurs par ordre alphabétique : ")
+        for n in range(len(players_list)):
+            print(
+                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n",
+                end=""
+            )
+        print("\n")
 
     def get_players(self):
         return self.players
@@ -222,6 +253,7 @@ class Tournament:
             "time_control": self.time_control,
             "description": self.description,
             "nb_rounds": self.nb_rounds,
+            "finished": self.finished,
             "remaining_rounds": self.remaining_rounds,
             "rounds": rounds,
             "players": players,
@@ -238,6 +270,7 @@ class Tournament:
         description = serialized_tournament["description"]
         nb_rounds = serialized_tournament["nb_rounds"]
         remaining_rounds = serialized_tournament["remaining_rounds"]
+        finished = serialized_tournament["finished"]
         rounds = []
         for r in serialized_tournament["rounds"]:
             rounds.append(Round.deserialize_round(r))
@@ -254,6 +287,7 @@ class Tournament:
             description,
             nb_rounds,
             remaining_rounds,
+            finished,
             rounds,
             players,
             ranking
@@ -266,10 +300,13 @@ class Tournament:
         self.rounds.clear()
         self.ranking.clear()
 
+    def set_finished(self):
+        self.finished = True
+
 
 '''tr = Tournament("test","location","date","time","des")
-playerA = Player("a","a","datenais","f",10)
-playerB = Player("b","b","datenais","f",10)
+playerA = Player("a","a","date_naissance","f",10)
+playerB = Player("b","b","date_naissance","f",10)
 tr.add_player(playerA)
 tr.add_player(playerB)
 

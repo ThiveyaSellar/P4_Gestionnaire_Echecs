@@ -1,5 +1,7 @@
 # import db
 # import pprint
+from tinydb import where
+
 from models.tournament import Tournament
 # from models.match import Match
 from models.round import Round
@@ -36,7 +38,7 @@ class Controller:
 
     def show_players2(self):
         players_table = self.db.table('players')
-        serialized_players = players_table.all() # À ordonner selon classement
+        serialized_players = players_table.all()
         players = []
         for sp in serialized_players:
             player = Player(
@@ -51,7 +53,7 @@ class Controller:
 
     def show_players(self):
         players_table = self.db.table('players')
-        serialized_players = players_table.all() # À ordonner selon classement
+        serialized_players = players_table.all()
         for sp in serialized_players:
             print(f"{sp.doc_id}     {sp['last_name']} {sp['first_name']} ({sp['rank']})")
 
@@ -153,6 +155,7 @@ class Controller:
         # Vérifier que le i est bien dans la bd sinon redemander
         # Demander le nouveau classement
         rank = self.view.get_new_rank()
+        print()
         players_table = self.db.table('players')
         # À résoudre
         players_table.update({'rank': rank}, doc_ids=[i])
@@ -266,8 +269,55 @@ class Controller:
         elif not tournament.has_remaining_rounds():
             final_ranking = self.view.end_tournament(tournament)
             tournament.update_ranking(final_ranking)
+            tournament.set_finished()
 
+    def show_all_tournaments(self):
+        # Afficher les tournois
+        tournaments = self.db.table('tournaments').all()
+        if len(tournaments) != 0:
+            tournaments_id = []
+            # Récupérer tous les id
+            for t in tournaments:
+                tournaments_id.append(str(t.doc_id))
+            # Montrer les tournois
+            self.show_tournaments(tournaments_id)
+            return tournaments, tournaments_id
+        else:
+            print("Aucun tournoi ...")
+            tournaments_id = None
+            return tournaments, tournaments_id
 
+    def select_tournament(self):
+        tournaments, tournaments_id = self.show_all_tournaments()
+        if tournaments_id is not None:
+            # Demander l'id du tournoi
+            t_id = self.view.choose_tournament(tournaments_id)
+            # Récupérer le tournoi avec cet id
+            tournaments_table = self.db.table('tournaments')
+            t = tournaments_table.get(doc_id=t_id)
+            rounds = []
+            for round in t['rounds']:
+                rounds.append(Round.deserialize_round(round))
+            players = []
+            for player in t['players']:
+                players.append(Player.deserialize_player(player))
+            tournament = Tournament(
+                t['name'],
+                t['location'],
+                t['date'],
+                t['time_control'],
+                t['description'],
+                int(t['nb_rounds']),
+                int(t['remaining_rounds']),
+                t['finished'],
+                rounds,
+                players,
+                t['ranking']
+            )
+            print(tournament)
+            return tournament
+        else:
+            return None
 
     def run(self):
         running = True
@@ -320,7 +370,8 @@ class Controller:
                 print("Reprendre le tournoi")
                 # Récupérer les tournois dans la base de données
                 # Afficher les tournois avec leurs ids
-                tournaments = self.db.table('tournaments').all()
+                # tournaments = self.db.table('tournaments').all()
+                tournaments = self.db.table('tournaments').search(where('finished')==False)
                 if len(tournaments) != 0:
                     tournaments_id = []
                     # Récupérer tous les id
@@ -330,26 +381,29 @@ class Controller:
                     self.show_tournaments(tournaments_id)
                     # Demander l'id du tournoi
                     t_id = self.view.choose_tournament(tournaments_id)
-                    t_id = int(t_id)
+                    # Récupérer le tournoi avec cet id
+                    tournaments_table = self.db.table('tournaments')
+                    t = tournaments_table.get(doc_id=t_id)
                     rounds = []
-                    for round in tournaments[t_id - 1]['rounds']:
+                    for round in t['rounds']:
                         rounds.append(Round.deserialize_round(round))
                     players = []
-                    for player in tournaments[t_id - 1]['players']:
+                    for player in t['players']:
                         players.append(Player.deserialize_player(player))
                     tournament = Tournament(
-                            tournaments[t_id - 1]['name'],
-                            tournaments[t_id - 1]['location'],
-                            tournaments[t_id - 1]['date'],
-                            tournaments[t_id - 1]['time_control'],
-                            tournaments[t_id - 1]['description'],
-                            int(tournaments[t_id - 1]['nb_rounds']),
-                            int(tournaments[t_id - 1]['remaining_rounds']),
+                            t['name'],
+                            t['location'],
+                            t['date'],
+                            t['time_control'],
+                            t['description'],
+                            int(t['nb_rounds']),
+                            int(t['remaining_rounds']),
+                            t['finished'],
                             rounds,
                             players,
-                            tournaments[t_id - 1]['ranking']
+                            t['ranking']
                         )
-                    print(tournament)
+                    # print(tournament)
                     # Continuer
                     self.run_tournament(tournament)
                     self.save_tournament(tournament, t_id)
@@ -358,80 +412,56 @@ class Controller:
             elif choice == 4:
                 # Liste de rapports
                 print("Liste des rapports")
-                """
-                Rapports :
 
-                • Liste de tous les acteurs:
-                    ◦ par ordre alphabétique
-                    ◦ par classement.
-                • Liste de tous les joueurs d'un tournoi:
-                    ◦ par ordre alphabétique
-                    ◦ par classement.
-                • Liste de tous les tournois.
-                • Liste de tous les tours d'un tournoi.
-                • Liste de tous les matchs d'un tournoi.
-
-                """
+                # Demander le rapport souhaité
                 selection = self.view.select_report()
                 if selection == 1:
+                    # Lister les acteurs par ordre alphabétique
                     self.show_players_by_name()
                 elif selection == 2:
+                    # Lister les acteurs par classement
                     self.show_players_by_rank()
                 elif selection == 3:
-                    # Afficher les tournois
-                    # Récupérer le tournoi
-                    tournaments = self.db.table('tournaments').all()
-                    if len(tournaments) != 0:
-                        tournaments_id = []
-                        # Récupérer tous les id
-                        for t in tournaments:
-                            tournaments_id.append(str(t.doc_id))
-                        # Montrer les tournois
-                        self.show_tournaments(tournaments_id)
-                        # Demander l'id du tournoi
-                        t_id = self.view.choose_tournament(tournaments_id)
-                        t_id = int(t_id)
-                        players_list = []
-                        for player in tournaments[t_id - 1]['players']:
-                            players_list.append(Player.deserialize_player(player))
-                        self.show_tournament_players_by_name(players_list)
-                    else:
-                        print("Aucun tournoi disponible ...")
+                    '''
+                    Sélection d'un tournoi
+                    Affichage des joueurs par ordre alphabétique
+                    '''
+                    tournament = self.select_tournament()
+                    if tournament is not None:
+                        tournament.show_players_by_name()
+                        # self.show_tournament_players_by_name(players_list)
                 elif selection == 4:
-                    # Afficher les tournois
-                    # Récupérer le tournoi
-                    tournaments = self.db.table('tournaments').all()
-                    if len(tournaments) != 0:
-                        tournaments_id = []
-                        # Récupérer tous les id
-                        for t in tournaments:
-                            tournaments_id.append(str(t.doc_id))
-                        # Montrer les tournois
-                        self.show_tournaments(tournaments_id)
-                        # Demander l'id du tournoi
-                        t_id = self.view.choose_tournament(tournaments_id)
-                        t_id = int(t_id)
-                        players_list = []
-                        for player in tournaments[t_id - 1]['players']:
-                            players_list.append(Player.deserialize_player(player))
-                        self.show_tournament_players_by_rank(players_list)
-                    else:
-                        print("Aucun tournoi disponible ...")
+                    '''
+                    Sélection d'un tournoi
+                    Affichage des joueurs par classement
+                    '''
+                    tournament = self.select_tournament()
+                    if tournament is not None:
+                        tournament.show_players_by_ranking()
+                        # self.show_tournament_players_by_rank(players_list)
                 elif selection == 5:
-                    tournaments = self.db.table('tournaments').all()
-                    if len(tournaments) != 0:
-                        tournaments_id = []
-                        # Récupérer tous les id
-                        for t in tournaments:
-                            tournaments_id.append(str(t.doc_id))
-                        # Montrer les tournois
-                        self.show_tournaments(tournaments_id)
-                    else:
-                        print("Aucun tournoi ...")
+                    '''
+                    Lister tous les tournois
+                    '''
+                    self.show_all_tournaments()
                 elif selection == 6:
-                    print("Affichage des tours d'un tournoi")
-
-
+                    '''
+                    Sélection d'un tournoi
+                    Affichage des tours de ce tournoi
+                    '''
+                    tournament = self.select_tournament()
+                    if tournament is not None:
+                        tournament.show_rounds()
+                elif selection == 7:
+                    '''
+                    Sélection d'un tournoi
+                    Affichage des matchs d'un tournoi
+                    '''
+                    tournament = self.select_tournament()
+                    if tournament is not None:
+                        tournament.show_rounds_and_matchs()
+                elif selection == 8:
+                    pass
             elif choice == 5:
                 # Quitter
                 running = False

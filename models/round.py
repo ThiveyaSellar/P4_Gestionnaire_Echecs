@@ -1,6 +1,7 @@
 from datetime import datetime
 from models.match import Match
 
+
 class Round:
 
     def __init__(self, name, start_date_time=datetime.now().strftime("%d/%m/%Y à %H:%M"),end_date_time = ""):
@@ -10,13 +11,15 @@ class Round:
         self.end_date_time = end_date_time
 
     def show_status(self):
-        print("Début : ")
-        print(self.start_date_time)
         if self.end_date_time == "":
-            print("Le round est en cours.")
+            end_msg = 'en cours'
         else:
-            print("Fin : ")
-            print(self.end_date_time)
+            end_msg = self.end_date_time
+        print(
+            f'{self.name} --- '
+            f'début : {self.start_date_time} --- '
+            f'fin : {end_msg}'
+        )
 
     def add_match(self, match):
         self.matchs.append(match)

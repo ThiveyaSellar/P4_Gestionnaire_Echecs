@@ -112,7 +112,6 @@ class Player:
         )
 
         player.update_score(score)
-        print(opponents)
         for o in opponents:
             player.add_opponent_in_deserialize(o)
 

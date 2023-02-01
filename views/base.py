@@ -37,7 +37,7 @@ class View:
     @staticmethod
     def prompt_for_player():
         infos = {
-            "last_name": input("Nom : \n"),
+            "last_name": input("Nom : \n").upper(),
             "first_name": input("Prénom: \n"),
             "birth_date": input("Date de naissance: \n"),
             "gender": input("Sexe : \n"),
@@ -59,6 +59,7 @@ class View:
 
     @staticmethod
     def get_player_index():
+        print()
         return int(input('Quel est le numéro du joueur ? \n'))
 
     @staticmethod
@@ -134,7 +135,7 @@ class View:
             if c[0] == int(choice):
                 tid = c[1]
                 break
-        return tid
+        return int(tid)
 
     @staticmethod
     def ask_starting():
@@ -224,7 +225,8 @@ class View:
     def select_report():
         choice = input(
             """ 
-            Rapports :
+            ----- Rapports -----
+            
             * Acteurs :
                 1) par ordre alphabétique
                 2) par classement
@@ -233,10 +235,11 @@ class View:
                 4) par classement
             5) Tournois
             6) Tours d'un tournoi
-            7) Matchs d'un tournoi    
+            7) Matchs d'un tournoi
+            8) Retour au menu principal    
             """
         )
-        while int(choice) <= 0 or int(choice) >= 8:
+        while int(choice) <= 0 or int(choice) >= 9:
             choice = input(
                 """ 
                 Rapports :
@@ -248,7 +251,8 @@ class View:
                     4) par classement
                 5) Tournois
                 6) Tours d'un tournoi
-                7) Matchs d'un tournoi    
+                7) Matchs d'un tournoi
+                8) Retour au menu principal
                 """
             )
         return int(choice)
