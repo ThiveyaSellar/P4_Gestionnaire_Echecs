@@ -178,7 +178,7 @@ class Tournament:
     def show_rounds(self):
         print("Liste de tous les tours :")
         for round in self.rounds:
-            print(round.show_status())
+            round.show_status()
 
     def show_rounds_and_matchs(self):
         print("Liste de tous les tours d'un tournoi avec leurs matchs")

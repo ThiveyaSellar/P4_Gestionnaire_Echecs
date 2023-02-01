@@ -51,15 +51,43 @@ class Controller:
             players.append(player)
         self.view.display_all_players(players)
 
+    @staticmethod
+    def get_key(element):
+        return element[0]
+
     def show_players(self):
         players_table = self.db.table('players')
         serialized_players = players_table.all()
+        players = []
         for sp in serialized_players:
-            print(f"{sp.doc_id}     {sp['last_name']} {sp['first_name']} ({sp['rank']})")
+            players.append(
+                (
+                    sp.doc_id,
+                    Player(
+                        sp["last_name"],
+                        sp["first_name"],
+                        sp["birth_date"],
+                        sp["gender"],
+                        sp["rank"]
+                    )
+                )
+            )
+        players = sorted(
+            players,
+            key=Controller.get_key
+        )
+
+        for p in players:
+            print(
+                f"{p[0]}\t"
+                f"{p[1].get_last_name()} " 
+                f"{p[1].get_first_name()}\t\t"
+                f"({p[1].get_rank()})"
+            )
 
     def show_players_by_rank(self):
         players_table = self.db.table('players')
-        serialized_players = players_table.all()  # À ordonner selon classement
+        serialized_players = players_table.all()
         players_list = []
         for sp in serialized_players:
             p = Player(
@@ -74,14 +102,16 @@ class Controller:
         print("\nListe des joueurs par rang : ")
         for n in range(len(players_list)):
             print(
-                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n",
+                f"{players_list[n].get_rank()}\t"
+                f"{players_list[n].get_last_name()}"
+                f"{players_list[n].get_first_name()}\n",
                 end=""
             )
         print("\n")
 
     def show_players_by_name(self):
         players_table = self.db.table('players')
-        serialized_players = players_table.all()  # À ordonner selon classement
+        serialized_players = players_table.all()
         players_list = []
         for sp in serialized_players:
             p = Player(
@@ -92,33 +122,19 @@ class Controller:
                 sp['rank']
             )
             players_list.append(p)
-        players_list = sorted(players_list, key=lambda x: (x.last_name, x.first_name))
+        players_list = sorted(
+            players_list,
+            key=lambda x: (x.last_name, x.first_name)
+        )
         print("\nListe des joueurs par ordre alphabétique : ")
         for n in range(len(players_list)):
             print(
-                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n", end = ""
-            )
-        print("\n")
-
-    def show_tournament_players_by_name(self, players_list):
-        players_list = sorted(players_list, key=lambda x: (x.last_name, x.first_name))
-        print("\nListe des joueurs par ordre alphabétique : ")
-        for n in range(len(players_list)):
-            print(
-                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n", end = ""
-            )
-        print("\n")
-
-    def show_tournament_players_by_rank(self, players_list):
-        players_list.sort(key=lambda x: x.rank)
-        print("\nListe des joueurs par rang : ")
-        for n in range(len(players_list)):
-            print(
-                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n",
+                f"{players_list[n].get_rank()}\t"
+                f"{players_list[n].get_last_name()}"
+                f"{players_list[n].get_first_name()}\n",
                 end=""
             )
         print("\n")
-
 
     def show_players_to_add(self, id_list):
         for id in id_list:
@@ -135,10 +151,10 @@ class Controller:
 
     def show_tournaments(self, id_list):
         i = 1
-        for id in id_list:
+        for id_nb in id_list:
             # Afficher le tournoi dont l'id correspond
             tournaments_table = self.db.table('tournaments')
-            t = tournaments_table.get(doc_id=id)
+            t = tournaments_table.get(doc_id=id_nb)
             print(
                 # f"{t.doc_id}    "
                 f"{i}    "
@@ -199,7 +215,7 @@ class Controller:
             # Retirer de la liste des joueurs
             players_id.remove(str(p_id))
 
-    def update_players_scores(self, tournament, round):
+    def update_players_scores(self, round):
         for match in round.matchs:
             scores = self.view.get_scores(
                 match.player_a.get_name(),
@@ -239,7 +255,7 @@ class Controller:
             round.stop_round()
             round.show_status()
             # Saisir les scores
-            self.update_players_scores(tournament, round)
+            self.update_players_scores(round)
             # Ajouter le tour au tournoi
             tournament.add_round(round)
             # Demander si on continue
@@ -256,7 +272,7 @@ class Controller:
             round.stop_round()
             round.show_status()
             # Saisir les scores
-            self.update_players_scores(tournament, round)
+            self.update_players_scores(round)
             # Ajouter le tour au tournoi
             tournament.add_round(round)
             # S'il reste des tours demander si on continue
@@ -267,7 +283,7 @@ class Controller:
         if not play and tournament.has_remaining_rounds():
             print("Tournoi en pause")
         elif not tournament.has_remaining_rounds():
-            final_ranking = self.view.end_tournament(tournament)
+            final_ranking = "A modifier"
             tournament.update_ranking(final_ranking)
             tournament.set_finished()
 
@@ -429,7 +445,6 @@ class Controller:
                     tournament = self.select_tournament()
                     if tournament is not None:
                         tournament.show_players_by_name()
-                        # self.show_tournament_players_by_name(players_list)
                 elif selection == 4:
                     '''
                     Sélection d'un tournoi
@@ -438,7 +453,6 @@ class Controller:
                     tournament = self.select_tournament()
                     if tournament is not None:
                         tournament.show_players_by_ranking()
-                        # self.show_tournament_players_by_rank(players_list)
                 elif selection == 5:
                     '''
                     Lister tous les tournois

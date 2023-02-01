@@ -68,21 +68,16 @@ class View:
 
     @staticmethod
     def get_tournament_infos():
-        name = non_empty_input("Nom du tournoi :")
-        location = non_empty_input("Lieu du tournoi :")
+        name = non_empty_input("Nom du tournoi : ")
+        location = non_empty_input("Lieu du tournoi : ")
         # Vérifier la saisie valide d'une date
-        date = valid_date()
+        date = non_empty_input("Date du tournoi : ")
         choice = int(input(
             "Contrôle du temps :\n1 - Blitz\n2 - Bullet\n3 - Coup rapide\n"
         ))
         while choice != 1 and choice != 2 and choice != 3:
             choice = int(input(
-                """ 
-                Choisir le contrôle du temps :
-                1 - Blitz
-                2 - Bullet
-                3 - Coup rapide    
-                """
+                "Contrôle du temps :\n1 - Blitz\n2 - Bullet\n3 - Coup rapide\n"
             ))
         if choice == 1:
             time_control = "Blitz"
@@ -256,15 +251,3 @@ class View:
                 """
             )
         return int(choice)
-
-    @staticmethod
-    def end_tournament(tournament):
-        print("Fin du tournoi")
-        tournament.show_players()
-        # MAJ manuelle du classement des joueurs
-        print("Quel est le classement final ?")
-        ranking = []
-        for size in range(tournament.get_players_size()):
-            player = input("Saisir un joueur")
-            ranking.append(player)
-        return ranking
