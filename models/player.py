@@ -18,6 +18,9 @@ class Player:
     def get_first_name(self):
         return self.first_name
 
+    def get_names(self):
+        return self.first_name + " " + self.last_name
+
     def get_rank(self):
         return self.rank
 

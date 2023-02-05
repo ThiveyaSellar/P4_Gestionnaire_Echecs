@@ -99,15 +99,19 @@ class Controller:
             )
             players_list.append(p)
         players_list.sort(key=lambda x: x.rank)
-        print("\nListe des joueurs par rang : ")
-        for n in range(len(players_list)):
-            print(
-                f"{players_list[n].get_rank()}\t"
-                f"{players_list[n].get_last_name()}"
-                f"{players_list[n].get_first_name()}\n",
-                end=""
-            )
-        print("\n")
+
+        if len(players_list) == 0:
+            print("Aucun joueur inscrit...")
+        else:
+            print("\nListe des joueurs par rang : ")
+            for n in range(len(players_list)):
+                print(
+                    f"{players_list[n].get_rank()}\t"
+                    f"{players_list[n].get_last_name()}"
+                    f"{players_list[n].get_first_name()}\n",
+                    end=""
+                )
+            print("\n")
 
     def show_players_by_name(self):
         players_table = self.db.table('players')
@@ -126,15 +130,18 @@ class Controller:
             players_list,
             key=lambda x: (x.last_name, x.first_name)
         )
-        print("\nListe des joueurs par ordre alphabétique : ")
-        for n in range(len(players_list)):
-            print(
-                f"{players_list[n].get_rank()}\t"
-                f"{players_list[n].get_last_name()}"
-                f"{players_list[n].get_first_name()}\n",
-                end=""
-            )
-        print("\n")
+        if len(players_list) == 0:
+            print("Aucun joueur inscrit...")
+        else:
+            print("\nListe des joueurs par ordre alphabétique : ")
+            for n in range(len(players_list)):
+                print(
+                    f"{players_list[n].get_rank()}\t"
+                    f"{players_list[n].get_last_name()}"
+                    f"{players_list[n].get_first_name()}\n",
+                    end=""
+                )
+            print("\n")
 
     def show_players_to_add(self, id_list):
         for id in id_list:
@@ -170,10 +177,10 @@ class Controller:
         i = self.view.get_player_index()
         # Vérifier que le i est bien dans la bd sinon redemander
         # Demander le nouveau classement
-        rank = self.view.get_new_rank()
-        print()
         players_table = self.db.table('players')
-        # À résoudre
+        players_table_all = players_table.all()
+        rank = self.view.get_new_rank(players_table_all)
+        print()
         players_table.update({'rank': rank}, doc_ids=[i])
         # Update automatique des classements des autres joueurs ?
         # Si deux joueurs ont le même classement
@@ -283,7 +290,8 @@ class Controller:
         if not play and tournament.has_remaining_rounds():
             print("Tournoi en pause")
         elif not tournament.has_remaining_rounds():
-            final_ranking = "A modifier"
+            tournament.sort_players()
+            final_ranking = tournament.get_final_ranking()
             tournament.update_ranking(final_ranking)
             tournament.set_finished()
 
@@ -426,9 +434,6 @@ class Controller:
                 else:
                     print("Aucun tournoi en cours ...")
             elif choice == 4:
-                # Liste de rapports
-                print("Liste des rapports")
-
                 # Demander le rapport souhaité
                 selection = self.view.select_report()
                 if selection == 1:

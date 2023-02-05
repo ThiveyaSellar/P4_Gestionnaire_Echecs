@@ -7,7 +7,6 @@ class Match:
         self.player_b = player_b
         self.score_a = score_a
         self.score_b = score_b
-        # self.match = tuple()
 
     def __str__(self):
         return f"{self.match}"
@@ -16,13 +15,35 @@ class Match:
         self.score_a = score_a
         self.score_b = score_b
 
-
-        '''self.match = (
-            [self.player_a, self.score_a], [self.player_b, self.score_b]
-        )'''
-
     def show_infos(self):
-        print(self.player_a.show_name() + " vs " + self.player_b.show_name())
+        print(
+            self.player_a.show_name()
+            + " vs "
+            + self.player_b.show_name()
+        )
+
+    def show_match_winner(self):
+        if (self.score_a or self.score_b) == 1.0:
+            score_a = str(int(self.score_a))
+            score_b = str(int(self.score_b))
+        else:
+            score_a = str(self.score_a)
+            score_b = str(self.score_b)
+
+        if self.score_a == 0.5:
+            msg = "match nul"
+        elif self.score_a == 1.0:
+            msg = "gagnant: " + self.player_a.show_name()
+        else:
+            msg = "gagnant: " + self.player_b.show_name()
+
+        print(
+            self.player_a.show_name()
+            + " vs "
+            + self.player_b.show_name()
+            + "\t\t"
+            + msg
+        )
 
     def serialize(self):
         player_a = self.player_a.serialize()

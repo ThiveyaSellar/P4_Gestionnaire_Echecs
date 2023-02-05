@@ -61,6 +61,17 @@ class Tournament:
             print(self.players[n].get_last_name(), end=" ")
         print("\n")
 
+    def get_final_ranking(self):
+        final_ranking = ""
+        winner = self.players[0].get_names()
+        for n in range(len(self.players)):
+            final_ranking = \
+                final_ranking + self.players[n].get_names() + " "
+        print("Classement final :")
+        print(final_ranking)
+        print("Le gagnant de ce tournoi: " + winner)
+        return final_ranking
+
     def sort_players(self):
         self.players = sorted(self.players, key=lambda x: (-x.score, x.rank))
 
@@ -184,7 +195,7 @@ class Tournament:
         print("Liste de tous les tours d'un tournoi avec leurs matchs")
         for round in self.rounds:
             print(round.show_name() + ":")
-            round.show_matchs()
+            round.show_matchs_results()
             print("\n")
 
     def update_ranking(self, ranking):
@@ -302,22 +313,3 @@ class Tournament:
 
     def set_finished(self):
         self.finished = True
-
-
-'''tr = Tournament("test","location","date","time","des")
-playerA = Player("a","a","date_naissance","f",10)
-playerB = Player("b","b","date_naissance","f",10)
-tr.add_player(playerA)
-tr.add_player(playerB)
-
-round = Round('test')
-round2 = Round('toast')
-tr.add_round(round)
-tr.add_round(round2)
-a = tr.serialize()
-print('---------------------------------------------')
-print(a)
-
-print('---------------------------------------------')
-b = Tournament.deserialize_tournament(a)
-print(b.rounds)'''

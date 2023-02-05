@@ -12,7 +12,7 @@
     </li>
     <li>If time, segment the base.py file in controllers package.
      <ul>
-            <li>Save your work.</li>
+            <li>Save your work</li>
             <li>Segment</li>
         </ul> 
     </li>

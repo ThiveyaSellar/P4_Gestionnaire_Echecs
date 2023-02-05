@@ -63,8 +63,24 @@ class View:
         return int(input('Quel est le numéro du joueur ? \n'))
 
     @staticmethod
-    def get_new_rank():
-        return int(input('Quel est le nouveau classement de ce joueur ? \n'))
+    def get_new_rank(players):
+        update = True
+        rank = int(input('Quel est le nouveau classement de ce joueur ? \n'))
+        for p in range(len(players)):
+            if players[p]['rank'] == rank:
+                update = False
+                break
+        while not update:
+            update = True
+            print("Ce classement existe déjà!")
+            rank = int(
+                input('Quel est le nouveau classement de ce joueur ? \n'))
+            for p in range(len(players)):
+                if players[p]['rank'] == rank:
+                    update = False
+                    break
+
+        return rank
 
     @staticmethod
     def get_tournament_infos():
@@ -85,7 +101,8 @@ class View:
             time_control = "Bullet"
         elif choice == 3:
             time_control = "Coup rapide"
-        print("Ajouter une description : ")
+        print(
+            "Description : (une fois la saisie terminée, appuyez sur Entrée)")
         description = multiline_input()
 
         infos = {
@@ -114,7 +131,7 @@ class View:
         # Associant l'indice affiché du tournoi avec le doc_id du tournoi
         correspondances = []
         for nb in range(nb_tournaments):
-            correspondances.append((nb+1, tournaments_id[nb]))
+            correspondances.append((nb + 1, tournaments_id[nb]))
 
         # Demander l'indice et vérifier la saisie
         choice = input("Numéro du tournoi : \n")
@@ -162,7 +179,7 @@ class View:
         ).upper()
         while answer != 'FIN':
             answer = input(
-                 "Quand le tour est terminé saisir 'FIN'.  \n"
+                "Quand le tour est terminé saisir 'FIN'.  \n"
             ).upper()
 
     @staticmethod
@@ -218,36 +235,23 @@ class View:
 
     @staticmethod
     def select_report():
-        choice = input(
-            """ 
-            ----- Rapports -----
-            
-            * Acteurs :
-                1) par ordre alphabétique
-                2) par classement
-            * Joueurs d'un tournoi :
-                3) par ordre alphabétique
-                4) par classement
-            5) Tournois
-            6) Tours d'un tournoi
-            7) Matchs d'un tournoi
-            8) Retour au menu principal    
-            """
-        )
+        menu = """
+        ----- Rapports -----
+                    
+        * Acteurs :
+            1) par ordre alphabétique
+            2) par classement
+        * Joueurs d'un tournoi :
+            3) par ordre alphabétique
+            4) par classement
+        5) Tournois
+        6) Tours d'un tournoi
+        7) Matchs d'un tournoi
+        8) Retour au menu principal    
+        """
+        print(menu)
+        choice = input("Votre choix : \n")
         while int(choice) <= 0 or int(choice) >= 9:
-            choice = input(
-                """ 
-                Rapports :
-                * Acteurs :
-                    1) par ordre alphabétique
-                    2) par classement
-                * Joueurs d'un tournoi :
-                    3) par ordre alphabétique
-                    4) par classement
-                5) Tournois
-                6) Tours d'un tournoi
-                7) Matchs d'un tournoi
-                8) Retour au menu principal
-                """
-            )
+            print(menu)
+            choice = input("Votre choix : \n")
         return int(choice)

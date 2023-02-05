@@ -31,6 +31,10 @@ class Round:
         for match in self.matchs:
             match.show_infos()
 
+    def show_matchs_results(self):
+        for match in self.matchs:
+            match.show_match_winner()
+
     def show_name(self):
         return self.name
 
