@@ -162,12 +162,17 @@ class Controller:
             # Afficher le tournoi dont l'id correspond
             tournaments_table = self.db.table('tournaments')
             t = tournaments_table.get(doc_id=id_nb)
+            if t['finished']:
+                statut = "terminé"
+            else:
+                statut = "en cours"
             print(
                 # f"{t.doc_id}    "
-                f"{i}    "
-                f"{t['name']} "
-                f"{t['date']} "
-                f"{t['location']} "
+                f"{i}\t"
+                f"{t['name']}\t"
+                f"{t['date']}\t"
+                f"{t['location']}\t"
+                f"{statut}"
             )
             i = i + 1
         print()
@@ -243,7 +248,11 @@ class Controller:
         if tournament_id is None:
             tournament_table.insert(serialized_tournament)
         else:
-            # item = tournament_table.update({str(tournament_id) : "serialized_tournament"}, doc_ids=[tournament_id])
+            '''
+            item = tournament_table.update(
+                {str(tournament_id) : "serialized_tournament"},
+                doc_ids=[tournament_id]
+            )'''
             tournament_table.remove(doc_ids=[tournament_id])
             tournament_table.insert(serialized_tournament)
 
@@ -290,9 +299,14 @@ class Controller:
         if not play and tournament.has_remaining_rounds():
             print("Tournoi en pause")
         elif not tournament.has_remaining_rounds():
+            # Fin du tournoi
+            # Trier des joueurs par rapport au dernier classement et
             tournament.sort_players()
+            # Récupérer le dernier classement
             final_ranking = tournament.get_final_ranking()
+            # Mettre à jour le classement final du tournoi
             tournament.update_ranking(final_ranking)
+            # Marquer le tournoi comme terminé
             tournament.set_finished()
 
     def show_all_tournaments(self):
@@ -371,31 +385,42 @@ class Controller:
             elif choice == 2:
                 # Nouveau tournoi
                 # Créer le tournoi
-                tournament = self.create_tournament()
-                '''if not tournament.has_remaining_rounds():
-                    tournament.clear_all()'''
-                tournament.clear_all()
-                # Ajouter 8 joueurs au tournoi créé
-                self.add_players(tournament)
-                # Demander si on commence le tournoi
-                start = self.view.ask_starting()
-                # Si oui commence sinon retour au menu principal
-                if start:
-                    self.run_tournament(tournament)
-                    # Enregistrer l'état du tournoi
-                    self.save_tournament(tournament)
+                players = self.db.table('players').all()
+                if len(players) >= Tournament.NB_PLAYERS:
+                    tournament = self.create_tournament()
+                    '''if not tournament.has_remaining_rounds():
+                        tournament.clear_all()'''
+                    tournament.clear_all()
+                    # Ajouter 8 joueurs au tournoi créé
+                    self.add_players(tournament)
+                    # Demander si on commence le tournoi
+                    start = self.view.ask_starting()
+                    # Si oui commence sinon retour au menu principal
+                    if start:
+                        self.run_tournament(tournament)
+                        # Enregistrer l'état du tournoi
+                        self.save_tournament(tournament)
+                    else:
+                        print("Tournoi en pause")
+                        # Sauvegarder l'état du tournoi
+                        self.save_tournament(tournament)
+                        # Retour au menu principal
                 else:
-                    print("Tournoi en pause")
-                    # Sauvegarder l'état du tournoi
-                    self.save_tournament(tournament)
-                    # Retour au menu principal
+                    msg = """
+                    Avant de commencer un nouveau tournoi,
+                    veuillez ajouter """ + str(Tournament.NB_PLAYERS) + """
+                    joueurs au moins dans la base de données.
+                    """
+                    print(msg)
             elif choice == 3:
                 # Reprendre le tournoi
                 print("Reprendre le tournoi")
                 # Récupérer les tournois dans la base de données
                 # Afficher les tournois avec leurs ids
                 # tournaments = self.db.table('tournaments').all()
-                tournaments = self.db.table('tournaments').search(where('finished')==False)
+                tournaments = self.db.table('tournaments').search(
+                    where('finished') is False
+                )
                 if len(tournaments) != 0:
                     tournaments_id = []
                     # Récupérer tous les id

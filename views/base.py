@@ -1,4 +1,4 @@
-from models.tools import non_empty_input, valid_date, multiline_input
+from models.tools import non_empty_input, ask_date, multiline_input
 
 
 class View:
@@ -39,7 +39,7 @@ class View:
         infos = {
             "last_name": input("Nom : \n").upper(),
             "first_name": input("Prénom: \n"),
-            "birth_date": input("Date de naissance: \n"),
+            "birth_date": ask_date("Date de naissance"),
             "gender": input("Sexe : \n"),
             "rank": int(input("Classement : \n"))
         }
@@ -87,7 +87,7 @@ class View:
         name = non_empty_input("Nom du tournoi : ")
         location = non_empty_input("Lieu du tournoi : ")
         # Vérifier la saisie valide d'une date
-        date = non_empty_input("Date du tournoi : ")
+        date = ask_date("Date du tournoi")
         choice = int(input(
             "Contrôle du temps :\n1 - Blitz\n2 - Bullet\n3 - Coup rapide\n"
         ))
@@ -239,15 +239,15 @@ class View:
         ----- Rapports -----
                     
         * Acteurs :
-            1) par ordre alphabétique
-            2) par classement
+            1 - par ordre alphabétique
+            2 - par classement
         * Joueurs d'un tournoi :
-            3) par ordre alphabétique
-            4) par classement
-        5) Tournois
-        6) Tours d'un tournoi
-        7) Matchs d'un tournoi
-        8) Retour au menu principal    
+            3 - par ordre alphabétique
+            4 - par classement
+        5 - Tournois
+        6 - Tours d'un tournoi
+        7 - Matchs d'un tournoi
+        8 - Retour au menu principal    
         """
         print(menu)
         choice = input("Votre choix : \n")
