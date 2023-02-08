@@ -115,6 +115,18 @@ class View:
         return infos
 
     @staticmethod
+    def show_players_to_add(players, players_id):
+        for nb in range(len(players)):
+            if str(nb+1) in players_id:
+                print(
+                    f"{str(nb+1)}     "
+                    f"{players[nb]['last_name']} "
+                    f"{players[nb]['first_name']} "
+                    f"({players[nb]['rank']})"
+                )
+        print()
+
+    @staticmethod
     def add_player(ids):
         pid = input("Numéro du joueur : \n")
         correct = True if pid in ids else False

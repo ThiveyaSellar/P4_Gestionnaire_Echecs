@@ -143,19 +143,6 @@ class Controller:
                 )
             print("\n")
 
-    def show_players_to_add(self, id_list):
-        for id in id_list:
-            # Afficher le joueur dont l'id correspond
-            players_table = self.db.table('players')
-            p = players_table.get(doc_id=id)
-            print(
-                f"{p.doc_id}     "
-                f"{p['last_name']} "
-                f"{p['first_name']} "
-                f"({p['rank']})"
-            )
-        print()
-
     def show_tournaments(self, id_list):
         i = 1
         for id_nb in id_list:
@@ -210,7 +197,7 @@ class Controller:
             players_id.append(str(p.doc_id))
         for p in range(tournament.NB_PLAYERS):
             # Montrer les joueurs
-            self.show_players_to_add(players_id)
+            self.view.show_players_to_add(players, players_id)
             # Demander l'id du joueur
             p_id = self.view.add_player(players_id)
             # Créer le joueur et l'ajouter au tournoi grâce à l'id
