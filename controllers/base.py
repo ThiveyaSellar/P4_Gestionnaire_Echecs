@@ -2,6 +2,7 @@
 # import pprint
 from tinydb import where
 
+
 from models.tournament import Tournament
 # from models.match import Match
 from models.round import Round
@@ -36,21 +37,6 @@ class Controller:
         players_table = self.db.table('players')
         players_table.insert(serialized_player)
 
-    def show_players2(self):
-        players_table = self.db.table('players')
-        serialized_players = players_table.all()
-        players = []
-        for sp in serialized_players:
-            player = Player(
-                sp["last_name"],
-                sp["first_name"],
-                sp["birth_date"],
-                sp["gender"],
-                sp["rank"]
-            )
-            players.append(player)
-        self.view.display_all_players(players)
-
     @staticmethod
     def get_key(element):
         return element[0]
@@ -76,14 +62,7 @@ class Controller:
             players,
             key=Controller.get_key
         )
-
-        for p in players:
-            print(
-                f"{p[0]}\t"
-                f"{p[1].get_last_name()} " 
-                f"{p[1].get_first_name()}\t\t"
-                f"({p[1].get_rank()})"
-            )
+        self.view.show_list_of_players(players)
 
     def show_players_by_rank(self):
         players_table = self.db.table('players')
@@ -100,18 +79,7 @@ class Controller:
             players_list.append(p)
         players_list.sort(key=lambda x: x.rank)
 
-        if len(players_list) == 0:
-            print("Aucun joueur inscrit...")
-        else:
-            print("\nListe des joueurs par rang : ")
-            for n in range(len(players_list)):
-                print(
-                    f"{players_list[n].get_rank()}\t"
-                    f"{players_list[n].get_last_name()}"
-                    f"{players_list[n].get_first_name()}\n",
-                    end=""
-                )
-            print("\n")
+        self.view.show_players1(players_list, "rang")
 
     def show_players_by_name(self):
         players_table = self.db.table('players')
@@ -130,37 +98,20 @@ class Controller:
             players_list,
             key=lambda x: (x.last_name, x.first_name)
         )
-        if len(players_list) == 0:
-            print("Aucun joueur inscrit...")
-        else:
-            print("\nListe des joueurs par ordre alphabétique : ")
-            for n in range(len(players_list)):
-                print(
-                    f"{players_list[n].get_rank()}\t"
-                    f"{players_list[n].get_last_name()}"
-                    f"{players_list[n].get_first_name()}\n",
-                    end=""
-                )
-            print("\n")
+        self.view.show_players1(players_list, "ordre alphabétique")
 
     def show_tournaments(self, id_list):
         i = 1
+        tournaments_table = self.db.table('tournaments')
         for id_nb in id_list:
             # Afficher le tournoi dont l'id correspond
-            tournaments_table = self.db.table('tournaments')
             t = tournaments_table.get(doc_id=id_nb)
             if t['finished']:
                 statut = "terminé"
             else:
                 statut = "en cours"
-            print(
-                # f"{t.doc_id}    "
-                f"{i}\t"
-                f"{t['name']}\t"
-                f"{t['date']}\t"
-                f"{t['location']}\t"
-                f"{statut}"
-            )
+            tournament = Tournament.deserialize_tournament(t)
+            self.view.show_tournament(i, tournament, statut)
             i = i + 1
         print()
 
@@ -172,10 +123,7 @@ class Controller:
         players_table = self.db.table('players')
         players_table_all = players_table.all()
         rank = self.view.get_new_rank(players_table_all)
-        print()
         players_table.update({'rank': rank}, doc_ids=[i])
-        # Update automatique des classements des autres joueurs ?
-        # Si deux joueurs ont le même classement
 
     def create_tournament(self):
         infos = self.view.get_tournament_infos()
@@ -211,27 +159,29 @@ class Controller:
                     int(players[p_id-1]['rank']),
                 )
             )
+            # msg = players[p_id-1]['last_name'] + " est ajouté au tournoi. \n"
+            # self.view.show_message(msg)
             # Retirer de la liste des joueurs
             players_id.remove(str(p_id))
 
     def update_players_scores(self, round):
-        for match in round.matchs:
+        for match in round.get_matchs():
             scores = self.view.get_scores(
-                match.player_a.get_name(),
-                match.player_b.get_name()
+                match.get_player_a().get_names(),
+                match.get_player_b().get_names()
             )
             match.add_score(scores[0], scores[1])
-            match.player_a.update_score(scores[0])
-            match.player_b.update_score(scores[1])
+            match.get_player_a().update_score(scores[0])
+            match.get_player_b().update_score(scores[1])
 
     def save_tournament(self, tournament, tournament_id=None):
         # Sérialiser le tournoi pour l'insertion dans TinyDB
         serialized_tournament = tournament.serialize()
         # Récupérer la table tournoi
         tournament_table = self.db.table('tournaments')
-        # S'il n'y a pas de id associé au tournoi
+        # S'il n'y a pas d'id associé au tournoi
         # Il n'existe pas et donc on l'insère
-        # Sinon on update
+        # Sinon on met à jour
         if tournament_id is None:
             tournament_table.insert(serialized_tournament)
         else:
@@ -248,32 +198,39 @@ class Controller:
         play = True
         # Si aucun tour a été joué lancé le tour 1
         if tournament.remaining_rounds == tournament.NB_ROUNDS:
+            self.view.show_players(tournament)
             # Demander le nom du premier tour
             round_name = self.view.ask_round_name()
             # Créer le premier tour et afficher les matchs
             round = tournament.prepare_round_one(round_name)
-            round.show_status()
-            # Terminer le tour
-            self.view.ending_round()
-            round.stop_round()
-            round.show_status()
-            # Saisir les scores
-            self.update_players_scores(round)
-            # Ajouter le tour au tournoi
-            tournament.add_round(round)
-            # Demander si on continue
-            play = self.view.ask_continuing()
+            if round is None:
+                self.view.show_message(
+                    "Le nombre de joueurs doit être pair ..."
+                )
+            else:
+                self.view.show_round_infos(round)
+                # Terminer le tour
+                self.view.ending_round()
+                round.stop_round()
+                self.view.show_round_status(round)
+                # Saisir les scores
+                self.update_players_scores(round)
+                # Ajouter le tour au tournoi
+                tournament.add_round(round)
+                # Demander si on continue
+                play = self.view.ask_continuing()
 
         while play and tournament.has_remaining_rounds():
+            self.view.show_players(tournament)
             # Demander le nom du round
             round_name = self.view.ask_round_name()
             # Créer le tour et afficher les matchs
             round = tournament.prepare_next_round(round_name)
-            round.show_status()
+            self.view.show_round_infos(round)
             # Terminer le tour
             self.view.ending_round()
             round.stop_round()
-            round.show_status()
+            self.view.show_round_status(round)
             # Saisir les scores
             self.update_players_scores(round)
             # Ajouter le tour au tournoi
@@ -284,7 +241,7 @@ class Controller:
 
         # Afficher le statut
         if not play and tournament.has_remaining_rounds():
-            print("Tournoi en pause")
+            self.view.show_message("Tournoi en pause")
         elif not tournament.has_remaining_rounds():
             # Fin du tournoi
             # Trier des joueurs par rapport au dernier classement et
@@ -294,6 +251,7 @@ class Controller:
             # Mettre à jour le classement final du tournoi
             tournament.update_ranking(final_ranking)
             # Marquer le tournoi comme terminé
+            self.view.show_results(tournament.get_players()[0], final_ranking)
             tournament.set_finished()
 
     def show_all_tournaments(self):
@@ -308,7 +266,7 @@ class Controller:
             self.show_tournaments(tournaments_id)
             return tournaments, tournaments_id
         else:
-            print("Aucun tournoi ...")
+            self.view.show_message("Aucun tournoi ...")
             tournaments_id = None
             return tournaments, tournaments_id
 
@@ -339,7 +297,7 @@ class Controller:
                 players,
                 t['ranking']
             )
-            print(tournament)
+            self.view.show_tournament(t_id, tournament)
             return tournament
         else:
             return None
@@ -375,8 +333,6 @@ class Controller:
                 players = self.db.table('players').all()
                 if len(players) >= Tournament.NB_PLAYERS:
                     tournament = self.create_tournament()
-                    '''if not tournament.has_remaining_rounds():
-                        tournament.clear_all()'''
                     tournament.clear_all()
                     # Ajouter 8 joueurs au tournoi créé
                     self.add_players(tournament)
@@ -398,15 +354,16 @@ class Controller:
                     veuillez ajouter """ + str(Tournament.NB_PLAYERS) + """
                     joueurs au moins dans la base de données.
                     """
-                    print(msg)
+                    self.view.show_message(msg)
             elif choice == 3:
                 # Reprendre le tournoi
-                print("Reprendre le tournoi")
+                self.view.show_message("Reprendre le tournoi")
                 # Récupérer les tournois dans la base de données
                 # Afficher les tournois avec leurs ids
                 # tournaments = self.db.table('tournaments').all()
+                #tournaments = self.db.table('tournaments')
                 tournaments = self.db.table('tournaments').search(
-                    where('finished') is False
+                    where('finished') == False
                 )
                 if len(tournaments) != 0:
                     tournaments_id = []
@@ -420,31 +377,13 @@ class Controller:
                     # Récupérer le tournoi avec cet id
                     tournaments_table = self.db.table('tournaments')
                     t = tournaments_table.get(doc_id=t_id)
-                    rounds = []
-                    for round in t['rounds']:
-                        rounds.append(Round.deserialize_round(round))
-                    players = []
-                    for player in t['players']:
-                        players.append(Player.deserialize_player(player))
-                    tournament = Tournament(
-                            t['name'],
-                            t['location'],
-                            t['date'],
-                            t['time_control'],
-                            t['description'],
-                            int(t['nb_rounds']),
-                            int(t['remaining_rounds']),
-                            t['finished'],
-                            rounds,
-                            players,
-                            t['ranking']
-                        )
+                    tournament = Tournament.deserialize_tournament(t)
                     # print(tournament)
                     # Continuer
                     self.run_tournament(tournament)
                     self.save_tournament(tournament, t_id)
                 else:
-                    print("Aucun tournoi en cours ...")
+                    self.view.show_message("Aucun tournoi en cours ...")
             elif choice == 4:
                 # Demander le rapport souhaité
                 selection = self.view.select_report()
@@ -460,16 +399,30 @@ class Controller:
                     Affichage des joueurs par ordre alphabétique
                     '''
                     tournament = self.select_tournament()
+                    players_list = sorted(
+                        self.players,
+                        key=lambda x: (x.last_name, x.first_name)
+                    )
                     if tournament is not None:
-                        tournament.show_players_by_name()
+                        self.view.show_players2(
+                            players_list,
+                            "ordre alphabétique"
+                        )
                 elif selection == 4:
                     '''
                     Sélection d'un tournoi
                     Affichage des joueurs par classement
                     '''
                     tournament = self.select_tournament()
+                    players_list = sorted(
+                        self.players,
+                        key=lambda x: x.rank
+                    )
                     if tournament is not None:
-                        tournament.show_players_by_ranking()
+                        self.view.show_players2(
+                            players_list,
+                            "rang"
+                        )
                 elif selection == 5:
                     '''
                     Lister tous les tournois
@@ -482,7 +435,7 @@ class Controller:
                     '''
                     tournament = self.select_tournament()
                     if tournament is not None:
-                        tournament.show_rounds()
+                        self.view.show_tournament_rounds(tournament)
                 elif selection == 7:
                     '''
                     Sélection d'un tournoi
@@ -490,7 +443,9 @@ class Controller:
                     '''
                     tournament = self.select_tournament()
                     if tournament is not None:
-                        tournament.show_rounds_and_matchs()
+                        self.view.show_matchs_and_rounds_in_tournament(
+                            tournament
+                        )
                 elif selection == 8:
                     pass
             elif choice == 5:

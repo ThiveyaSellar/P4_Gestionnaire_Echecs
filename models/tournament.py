@@ -1,18 +1,13 @@
-'''from models.round import Round
-from models.match import Match
-from models.player import Player'''
-
 from models.match import Match
 from models.player import Player
 from models.round import Round
-
-TIME = ("blitz", "bullet", "coup rapide")
 
 
 class Tournament:
 
     NB_PLAYERS = 8
     NB_ROUNDS = 4
+    TIME = ("blitz", "bullet", "coup rapide")
 
     def __init__(
         self,
@@ -45,50 +40,56 @@ class Tournament:
         # Classement final saisi par le manager
         self.ranking = ranking
 
-    def __str__(self):
-        return f"Tournoi {self.name} a {self.location} le {self.date}."
+    def get_name(self):
+        return self.name
 
-    def __repr__(self):
-        return str(self)
+    def get_date(self):
+        return self.date
+
+    def get_location(self):
+        return self.location
+
+    def get_rounds(self):
+        return self.rounds
+
+    def get_players(self):
+        return self.players
+
+    def get_players_size(self):
+        return len(self.players)
 
     def add_player(self, player):
         self.players.append(player)
-        print(player.show_name() + " est ajouté au tournoi. \n")
 
-    def show_players(self):
-        print("\nClassement des joueurs : ")
-        for n in range(len(self.players)):
-            print(self.players[n].get_last_name(), end=" ")
-        print("\n")
+    def update_ranking(self, ranking):
+        self.ranking = ranking
 
     def get_final_ranking(self):
         final_ranking = ""
+        # Le gagnant est le premier de la liste
         winner = self.players[0].get_names()
         for n in range(len(self.players)):
             final_ranking = \
                 final_ranking + self.players[n].get_names() + " "
-        print("Classement final :")
-        print(final_ranking)
-        print("Le gagnant de ce tournoi: " + winner)
         return final_ranking
 
     def sort_players(self):
         self.players = sorted(self.players, key=lambda x: (-x.score, x.rank))
 
-    '''
-    def decorate(function):
-        def wrapper(tournament):
-            # Trier les joueurs selon leurs scores et leurs classements
-            tournament.sort_players()
-            # Afficher le classement provisoire du tournoi
-            tournament.show_players()
-            result = function()
-            return result
-        return wrapper
-    '''
     def add_round(self, round):
         self.rounds.append(round)
         self.remaining_rounds = self.remaining_rounds - 1
+
+    def has_remaining_rounds(self):
+        return True if self.remaining_rounds > 0 else False
+
+    def clear_all(self):
+        self.players.clear()
+        self.rounds.clear()
+        self.ranking.clear()
+
+    def set_finished(self):
+        self.finished = True
 
     def prepare_round_one(self, round_name):
         """
@@ -97,10 +98,7 @@ class Tournament:
         Associer les joueurs de la partie supérieure avec ceux de la partie
         inférieure et les faire jouer ensemble
         """
-        # Ajoutées au lieu de decorate
         self.sort_players()
-        self.show_players()
-
         round = Round(round_name)
         nb_player = len(self.players)
         if nb_player % 2 == 0:
@@ -113,19 +111,14 @@ class Tournament:
                 player_a.add_opponent(player_b)
                 player_b.add_opponent(player_a)
                 round.add_match(match)
+            return round
         else:
-            print("Nombre impaire de joueurs pour le tournoi")
-        # self.rounds.append(round)
-        print(" ----------- " + round.show_name() + " ----------- ")
-        round.show_matchs()
-        return round
+            return None
 
     def prepare_next_round(self, round_name):
         # Ajoutées au lieu de decorate
         self.sort_players()
-        self.show_players()
         round = Round(round_name)
-        print(" ----------- " + round.show_name() + " ----------- ")
         # Liste des joueurs qu'il reste à coupler
         remaining_players = []
         for i in range(len(self.players)):
@@ -181,73 +174,8 @@ class Tournament:
             player_b.add_opponent(player_a)
             match = Match(player_a, player_b)
             round.add_match(match)
-        round.show_matchs()
-        # self.rounds.append(round)
 
         return round
-
-    def show_rounds(self):
-        print("Liste de tous les tours :")
-        for round in self.rounds:
-            round.show_status()
-
-    def show_rounds_and_matchs(self):
-        print("Liste de tous les tours d'un tournoi avec leurs matchs")
-        for round in self.rounds:
-            print(round.show_name() + ":")
-            round.show_matchs_results()
-            print("\n")
-
-    def update_ranking(self, ranking):
-        self.ranking = ranking
-
-    '''
-    def show_players_by_ranking(self):
-        players = sorted(self.players, key=lambda x: x.rank)
-        for player in players:
-            print(player.show_name(), end=" ")
-        print()
-
-    def show_players_by_name(self):
-        players = sorted(self.players, key=lambda x: x.last_name)
-        for player in players:
-            print(player.show_name(), end=" ")
-        print()
-    '''
-
-    def show_players_by_name(self):
-        players_list = sorted(
-            self.players,
-            key=lambda x: (x.last_name, x.first_name)
-        )
-        print("\nListe des joueurs par ordre alphabétique : ")
-        for n in range(len(players_list)):
-            print(
-                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n", end = ""
-            )
-        print("\n")
-
-    def show_players_by_ranking(self):
-        players_list = sorted(
-            self.players,
-            key=lambda x: x.rank
-        )
-        print("\nListe des joueurs par ordre alphabétique : ")
-        for n in range(len(players_list)):
-            print(
-                f"{players_list[n].get_rank()} -- {players_list[n].get_last_name()} -- {players_list[n].get_first_name()}\n",
-                end=""
-            )
-        print("\n")
-
-    def get_players(self):
-        return self.players
-
-    def get_players_size(self):
-        return len(self.players)
-
-    def has_remaining_rounds(self):
-        return True if self.remaining_rounds > 0 else False
 
     def serialize(self):
         rounds = []
@@ -306,10 +234,3 @@ class Tournament:
 
         return tournament
 
-    def clear_all(self):
-        self.players.clear()
-        self.rounds.clear()
-        self.ranking.clear()
-
-    def set_finished(self):
-        self.finished = True

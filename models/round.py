@@ -10,33 +10,23 @@ class Round:
         self.start_date_time = start_date_time
         self.end_date_time = end_date_time
 
-    def show_status(self):
-        if self.end_date_time == "":
-            end_msg = 'en cours'
-        else:
-            end_msg = self.end_date_time
-        print(
-            f'{self.name} --- '
-            f'début : {self.start_date_time} --- '
-            f'fin : {end_msg}'
-        )
+    def get_name(self):
+        return self.name
+
+    def get_matchs(self):
+        return self.matchs
 
     def add_match(self, match):
         self.matchs.append(match)
 
+    def get_start_date_time(self):
+        return self.start_date_time
+
+    def get_end_date_time(self):
+        return self.end_date_time
+
     def stop_round(self):
         self.end_date_time = datetime.now().strftime("%d/%m/%Y à %H:%M")
-
-    def show_matchs(self):
-        for match in self.matchs:
-            match.show_infos()
-
-    def show_matchs_results(self):
-        for match in self.matchs:
-            match.show_match_winner()
-
-    def show_name(self):
-        return self.name
 
     def serialize(self):
         serialized_matchs = []
@@ -49,7 +39,6 @@ class Round:
             'start_date_time': self.start_date_time,
             'end_date_time': self.end_date_time
         }
-
         return round
 
     @staticmethod
