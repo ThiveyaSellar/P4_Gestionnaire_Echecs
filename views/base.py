@@ -330,7 +330,7 @@ class View:
             for n in range(len(players_list)):
                 print(
                     f"{players_list[n].get_rank()}\t"
-                    f"{players_list[n].get_last_name()}"
+                    f"{players_list[n].get_last_name()}\t"
                     f"{players_list[n].get_first_name()}\n",
                     end=""
                 )

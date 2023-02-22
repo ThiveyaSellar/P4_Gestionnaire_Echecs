@@ -135,7 +135,7 @@ class Tournament:
                         a = temp[i][0]
                         b = temp[i][1]
                         if not (
-                                player.has_already_played_with(a) and
+                                player.has_already_played_with(a) or
                                 opponent.has_already_played_with(b)
                         ):
                             temp.remove([a, b])
@@ -144,7 +144,7 @@ class Tournament:
                             remaining_players.remove(opponent)
                             break
                         elif not (
-                                player.has_already_played_with(b) and
+                                player.has_already_played_with(b) or
                                 opponent.has_already_played_with(a)
                         ):
                             temp.remove([a, b])

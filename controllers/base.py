@@ -159,8 +159,8 @@ class Controller:
                     int(players[p_id-1]['rank']),
                 )
             )
-            # msg = players[p_id-1]['last_name'] + " est ajouté au tournoi. \n"
-            # self.view.show_message(msg)
+            msg = players[p_id-1]['last_name'] + " est ajouté au tournoi. \n"
+            self.view.show_message(msg)
             # Retirer de la liste des joueurs
             players_id.remove(str(p_id))
 
@@ -361,7 +361,7 @@ class Controller:
                 # Récupérer les tournois dans la base de données
                 # Afficher les tournois avec leurs ids
                 # tournaments = self.db.table('tournaments').all()
-                #tournaments = self.db.table('tournaments')
+                # tournaments = self.db.table('tournaments')
                 tournaments = self.db.table('tournaments').search(
                     where('finished') == False
                 )
