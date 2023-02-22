@@ -7,7 +7,7 @@ Gestion des joueurs, création de tournois, ajout des scores, affichage de rappo
 
 ```bash
 # Cloner le dépôt distant
-$ git clone https://github.com/ThiveyaSellar/P4_Echecs.git
+$ git clone https://github.com/ThiveyaSellar/P4_Gestionnaire_Echecs.git
 
 # Créer un environnement virtuel
 $ python -m venv env

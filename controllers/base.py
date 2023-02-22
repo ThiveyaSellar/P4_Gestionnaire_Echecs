@@ -366,7 +366,7 @@ class Controller:
                 # tournaments = self.db.table('tournaments').all()
                 # tournaments = self.db.table('tournaments')
                 tournaments = self.db.table('tournaments').search(
-                    where('finished') == False
+                    where('finished') == False  # noqa: E712
                 )
                 if len(tournaments) != 0:
                     tournaments_id = []
