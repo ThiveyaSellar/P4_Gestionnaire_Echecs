@@ -7,7 +7,6 @@ class View:
     def display_main_menu():
         menu = """
         ----- Menu principal -----
-        
         1 - Gestion des joueurs
         2 - Nouveau tournoi
         3 - Reprendre un tournoi en cours
@@ -23,7 +22,6 @@ class View:
     def display_player_management_options():
         menu = """
         ----- Gestion des joueurs -----
-        
         1 - Ajouter un nouveau joueur
         2 - Modifier le classement d'un joueur
         3 - Afficher les joueurs
@@ -152,6 +150,7 @@ class View:
             correct = True if (nb_tournaments >= int(choice) >= 1) else False
 
         # Récupérer le doc_id associé à l'indice choisi
+        tid = 0
         for c in correspondances:
             if c[0] == int(choice):
                 tid = c[1]
@@ -195,12 +194,12 @@ class View:
     def ask_score(player_name):
         print(f"Quel est le score de {player_name}?")
         score = float(input(
-            f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+            "Victoire: 1, Nul: 0.5, Échec: 0. \n"
         ))
         while score != 1.0 and score != 0.5 and score != 0.0:
             print(f"Quel est le score de {player_name}?")
             score = float(input(
-                f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+                "Victoire: 1, Nul: 0.5, Échec: 0. \n"
             ))
         return score
 
@@ -209,12 +208,12 @@ class View:
 
         print(f"Quel est le score de {name_a}?")
         score_a = float(input(
-            f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+            "Victoire: 1, Nul: 0.5, Échec: 0. \n"
         ))
         while score_a != 1.0 and score_a != 0.5 and score_a != 0.0:
             print(f"Quel est le score de {name_a}?")
             score_a = float(input(
-                f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
+                "Victoire: 1, Nul: 0.5, Échec: 0. \n"
             ))
         score_b = 0
         if score_a == 1:
@@ -248,7 +247,6 @@ class View:
     def select_report():
         menu = """
         ----- Rapports -----
-                    
         * Acteurs :
             1 - par ordre alphabétique
             2 - par classement
@@ -258,7 +256,7 @@ class View:
         5 - Tournois
         6 - Tours d'un tournoi
         7 - Matchs d'un tournoi
-        8 - Retour au menu principal    
+        8 - Retour au menu principal
         """
         print(menu)
         choice = input("Votre choix : \n")
@@ -319,7 +317,7 @@ class View:
         for p in players:
             print(
                 f"{p[0]}\t"
-                f"{p[1].get_last_name()} " 
+                f"{p[1].get_last_name()}\t"
                 f"{p[1].get_first_name()}\t\t"
                 f"({p[1].get_rank()})"
             )
