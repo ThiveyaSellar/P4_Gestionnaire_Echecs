@@ -67,7 +67,7 @@ class Tournament:
     def get_final_ranking(self):
         final_ranking = ""
         # Le gagnant est le premier de la liste
-        winner = self.players[0].get_names()
+        # winner = self.players[0].get_names()
         for n in range(len(self.players)):
             final_ranking = \
                 final_ranking + self.players[n].get_names() + " "
@@ -233,4 +233,3 @@ class Tournament:
         )
 
         return tournament
-

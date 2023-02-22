@@ -6,7 +6,12 @@ from models.manager import Manager
 
 def main():
     # db = TinyDB('chess_db.json')
-    db = TinyDB('chess_db.json', sort_keys=True, indent=4, separators=(',', ': '))
+    db = TinyDB(
+        'chess_db.json',
+        sort_keys=True,
+        indent=4,
+        separators=(',', ': ')
+    )
     # Récupérer tous les joueurs
     players = db.table('players').all()
     # Récupérer tous les tournois

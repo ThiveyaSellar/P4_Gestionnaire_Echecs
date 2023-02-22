@@ -1,5 +1,4 @@
 from models.tools import non_empty_input, ask_date, multiline_input
-from models.tournament import Tournament
 
 
 class View:
@@ -36,13 +35,13 @@ class View:
         return choice
 
     @staticmethod
-    def prompt_for_player():
+    def prompt_for_player(players):
         infos = {
             "last_name": input("Nom : \n").upper(),
             "first_name": input("Prénom: \n"),
-            "birth_date": ask_date("Date de naissance"),
+            "birth_date": str(ask_date("Date de naissance")),
             "gender": input("Sexe : \n"),
-            "rank": int(input("Classement : \n"))
+            "rank": int(View.get_new_rank(players))
         }
         return infos
 
@@ -61,16 +60,16 @@ class View:
     @staticmethod
     def get_new_rank(players):
         update = True
-        rank = int(input('Quel est le nouveau classement de ce joueur ? \n'))
+        rank = int(input('Quel est le classement de ce joueur ? \n'))
         for p in range(len(players)):
             if players[p]['rank'] == rank:
                 update = False
                 break
         while not update:
             update = True
-            print("Ce classement existe déjà!")
+            print("Ce classement existe déjà.")
             rank = int(
-                input('Quel est le nouveau classement de ce joueur ? \n'))
+                input('Quel est le classement de ce joueur ? \n'))
             for p in range(len(players)):
                 if players[p]['rank'] == rank:
                     update = False
@@ -97,6 +96,8 @@ class View:
             time_control = "Bullet"
         elif choice == 3:
             time_control = "Coup rapide"
+        else:
+            time_control = ""
         print(
             "Description : (une fois la saisie terminée, appuyez sur Entrée)")
         description = multiline_input()
@@ -205,6 +206,7 @@ class View:
 
     @staticmethod
     def get_scores(name_a, name_b):
+
         print(f"Quel est le score de {name_a}?")
         score_a = float(input(
             f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
@@ -214,6 +216,7 @@ class View:
             score_a = float(input(
                 f"Victoire: 1, Nul: 0.5, Échec: 0. \n"
             ))
+        score_b = 0
         if score_a == 1:
             score_b = 0
         elif score_a == 0.5:

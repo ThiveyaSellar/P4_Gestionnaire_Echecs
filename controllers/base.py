@@ -22,7 +22,10 @@ class Controller:
     def get_player_data(self):
         # Récupérer les données du nouveau joueur
         # Les ajouter dans la base de données
-        infos = self.view.prompt_for_player()
+        # Vérifier que le classement n'existe pas déjà dans la bd
+        players_table = self.db.table('players')
+        players_table_all = players_table.all()
+        infos = self.view.prompt_for_player(players_table_all)
         if not infos:
             return
         # Ajouter le joueur dans la base de données

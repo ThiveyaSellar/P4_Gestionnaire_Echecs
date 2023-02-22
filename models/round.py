@@ -4,7 +4,12 @@ from models.match import Match
 
 class Round:
 
-    def __init__(self, name, start_date_time=datetime.now().strftime("%d/%m/%Y à %H:%M"),end_date_time = ""):
+    def __init__(
+            self,
+            name,
+            start_date_time=datetime.now().strftime("%d/%m/%Y à %H:%M"),
+            end_date_time=""
+    ):
         self.name = name
         self.matchs = []
         self.start_date_time = start_date_time

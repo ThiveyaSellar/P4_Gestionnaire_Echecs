@@ -70,4 +70,3 @@ class Player:
         for o in opponents:
             player.add_opponent_in_deserialize(o)
         return player
-

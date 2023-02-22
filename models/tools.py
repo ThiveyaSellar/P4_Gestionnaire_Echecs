@@ -1,6 +1,4 @@
 import datetime
-from datetime import date
-import time
 
 
 def non_empty_input(msg):
@@ -26,4 +24,3 @@ def multiline_input():
             break
     text = '\n'.join(lines)
     return text
-
