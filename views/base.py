@@ -318,7 +318,7 @@ class View:
             print(
                 f"{p[0]}\t"
                 f"{p[1].get_last_name()}\t"
-                f"{p[1].get_first_name()}\t\t"
+                f"{p[1].get_first_name()}\t\t\t"
                 f"({p[1].get_rank()})"
             )
 
@@ -339,12 +339,18 @@ class View:
 
     @staticmethod
     def show_tournament(i, tournament, statut=""):
+        remaining = tournament.get_remaining_rounds_nb()
+        if remaining > 0:
+            msg = f"il reste {tournament.get_remaining_rounds_nb()} tours"
+        else:
+            msg = ""
         print(
             f"{i}\t"
             f"{tournament.get_name()}\t"
             f"{tournament.get_date()}\t"
             f"{tournament.get_location()}\t"
-            f"{statut}"
+            f"{statut}\t"
+            f"{msg}"
         )
 
     @staticmethod

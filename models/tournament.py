@@ -70,7 +70,7 @@ class Tournament:
         # winner = self.players[0].get_names()
         for n in range(len(self.players)):
             final_ranking = \
-                final_ranking + self.players[n].get_names() + " "
+                final_ranking + self.players[n].get_last_name() + " "
         return final_ranking
 
     def sort_players(self):
@@ -79,6 +79,9 @@ class Tournament:
     def add_round(self, round):
         self.rounds.append(round)
         self.remaining_rounds = self.remaining_rounds - 1
+
+    def get_remaining_rounds_nb(self):
+        return self.remaining_rounds
 
     def has_remaining_rounds(self):
         return True if self.remaining_rounds > 0 else False
