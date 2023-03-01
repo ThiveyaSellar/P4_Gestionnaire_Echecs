@@ -54,9 +54,11 @@ class Player:
         first_name = serialized_player["first_name"]
         birth_date = serialized_player["birth_date"]
         gender = serialized_player["gender"]
-        rank = serialized_player["rank"]
-        score = serialized_player["score"]
-        opponents = serialized_player["opponents"]
+        rank = int(serialized_player["rank"])
+        if "score" in serialized_player:
+            score = serialized_player["score"]
+        if "opponents" in serialized_player:
+            opponents = serialized_player["opponents"]
 
         player = Player(
             last_name,
@@ -66,7 +68,9 @@ class Player:
             rank
         )
 
-        player.update_score(score)
-        for o in opponents:
-            player.add_opponent_in_deserialize(o)
+        if "score" in serialized_player:
+            player.update_score(score)
+        if "opponents" in serialized_player:
+            for o in opponents:
+                player.add_opponent_in_deserialize(o)
         return player

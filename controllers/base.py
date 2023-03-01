@@ -1,11 +1,6 @@
-# import db
-# import pprint
 from tinydb import where
 
-
 from models.tournament import Tournament
-# from models.match import Match
-from models.round import Round
 from models.player import Player
 
 
@@ -20,83 +15,50 @@ class Controller:
         self.view = view
 
     def get_player_data(self):
-        # Récupérer les données du nouveau joueur
-        # Les ajouter dans la base de données
-        # Vérifier que le classement n'existe pas déjà dans la bd
+        # Récupérer la table player dans la base de données
         players_table = self.db.table('players')
+        # Récupérer toutes les lignes de la table player
         players_table_all = players_table.all()
-        infos = self.view.prompt_for_player(players_table_all)
-        if not infos:
+        # Demander les infos du nouveau joueur
+        # En vérifiant que le classement n'existe pas déjà
+        new_player_infos = self.view.prompt_for_player(players_table_all)
+        if not new_player_infos:
             return
-        # Ajouter le joueur dans la base de données
-        # sérialiser le joueur
-        serialized_player = {
-            "last_name": infos["last_name"],
-            "first_name": infos["first_name"],
-            "birth_date": infos["birth_date"],
-            "gender": infos["gender"],
-            "rank": infos["rank"]
-        }
-        players_table = self.db.table('players')
-        players_table.insert(serialized_player)
+        players_table.insert(new_player_infos)
 
     @staticmethod
     def get_key(element):
         return element[0]
 
     def show_players(self):
+        # Récupérer la table player dans la base de données
         players_table = self.db.table('players')
         serialized_players = players_table.all()
         players = []
         for sp in serialized_players:
-            players.append(
-                (
-                    sp.doc_id,
-                    Player(
-                        sp["last_name"],
-                        sp["first_name"],
-                        sp["birth_date"],
-                        sp["gender"],
-                        sp["rank"]
-                    )
-                )
-            )
-        players = sorted(
-            players,
-            key=Controller.get_key
-        )
+            players.append((sp.doc_id, Player.deserialize_player(sp)))
+        players = sorted(players, key=Controller.get_key)
         self.view.show_list_of_players(players)
 
-    def show_players_by_rank(self):
+    def get_and_deserialize_players(self):
         players_table = self.db.table('players')
         serialized_players = players_table.all()
         players_list = []
         for sp in serialized_players:
-            p = Player(
-                sp['last_name'],
-                sp['first_name'],
-                sp['birth_date'],
-                sp['gender'],
-                sp['rank']
-            )
-            players_list.append(p)
-        players_list.sort(key=lambda x: x.rank)
+            players_list.append(Player.deserialize_player(sp))
+        return players_list
 
+    def show_players_by_rank(self):
+        players_list = self.get_and_deserialize_players()
+        players_list.sort(key=lambda x: x.rank)
         self.view.show_players1(players_list, "rang")
 
     def show_players_by_name(self):
-        players_table = self.db.table('players')
-        serialized_players = players_table.all()
-        players_list = []
-        for sp in serialized_players:
-            p = Player(
-                sp['last_name'],
-                sp['first_name'],
-                sp['birth_date'],
-                sp['gender'],
-                sp['rank']
-            )
-            players_list.append(p)
+        """
+        Afficher les joueurs selon l'ordre alphabétique
+        :return:
+        """
+        players_list = self.get_and_deserialize_players()
         players_list = sorted(
             players_list,
             key=lambda x: (x.last_name, x.first_name)
@@ -114,21 +76,27 @@ class Controller:
             else:
                 statut = "en cours"
             tournament = Tournament.deserialize_tournament(t)
+            # Afficher le tournoi avec son statut
             self.view.show_tournament(i, tournament, statut)
             i = i + 1
         print()
 
     def update_player_rank(self):
-        # Récupérer le nom et prénom du joueur
+        # Demander le numéro du joueur à modifier
         i = self.view.get_player_index()
-        # Vérifier que le i est bien dans la bd sinon redemander
-        # Demander le nouveau classement
+        # Vérifier que le numéro est bien dans la bd sinon redemander
         players_table = self.db.table('players')
         players_table_all = players_table.all()
+        # Demander le nouveau classement
         rank = self.view.get_new_rank(players_table_all)
+        # Mettre à jour le classement dans la bd
         players_table.update({'rank': rank}, doc_ids=[i])
 
     def create_tournament(self):
+        """
+        Demande de quelques informations puis création d'un tournoi
+        :return:
+        """
         infos = self.view.get_tournament_infos()
         tournament = Tournament(
             infos["name"],
@@ -153,27 +121,23 @@ class Controller:
             p_id = self.view.add_player(players_id)
             # Créer le joueur et l'ajouter au tournoi grâce à l'id
             p_id = int(p_id)
-            tournament.add_player(
-                Player(
-                    players[p_id-1]['last_name'],
-                    players[p_id-1]['first_name'],
-                    players[p_id-1]['birth_date'],
-                    players[p_id-1]['gender'],
-                    int(players[p_id-1]['rank']),
-                )
-            )
+            tournament.add_player(Player.deserialize_player(players[p_id-1]))
             msg = players[p_id-1]['last_name'] + " est ajouté au tournoi. \n"
             self.view.show_message(msg)
             # Retirer de la liste des joueurs
             players_id.remove(str(p_id))
 
     def update_players_scores(self, round):
+        # Marquer les scores des matchs du round
         for match in round.get_matchs():
+            # Demander de saisie des scores pour un match
             scores = self.view.get_scores(
                 match.get_player_a().get_names(),
                 match.get_player_b().get_names()
             )
+            # Ajout des scores au match
             match.add_score(scores[0], scores[1])
+            # Mettre à jour le score total du joueur
             match.get_player_a().update_score(scores[0])
             match.get_player_b().update_score(scores[1])
 
@@ -188,11 +152,6 @@ class Controller:
         if tournament_id is None:
             tournament_table.insert(serialized_tournament)
         else:
-            '''
-            item = tournament_table.update(
-                {str(tournament_id) : "serialized_tournament"},
-                doc_ids=[tournament_id]
-            )'''
             tournament_table.remove(doc_ids=[tournament_id])
             tournament_table.insert(serialized_tournament)
 
@@ -274,32 +233,15 @@ class Controller:
             return tournaments, tournaments_id
 
     def select_tournament(self):
+        # Afficher tous les tournois
         tournaments, tournaments_id = self.show_all_tournaments()
         if tournaments_id is not None:
-            # Demander l'id du tournoi
+            # Demander l'id du tournoi choisi
             t_id = self.view.choose_tournament(tournaments_id)
             # Récupérer le tournoi avec cet id
             tournaments_table = self.db.table('tournaments')
             t = tournaments_table.get(doc_id=t_id)
-            rounds = []
-            for round in t['rounds']:
-                rounds.append(Round.deserialize_round(round))
-            players = []
-            for player in t['players']:
-                players.append(Player.deserialize_player(player))
-            tournament = Tournament(
-                t['name'],
-                t['location'],
-                t['date'],
-                t['time_control'],
-                t['description'],
-                int(t['nb_rounds']),
-                int(t['remaining_rounds']),
-                t['finished'],
-                rounds,
-                players,
-                t['ranking']
-            )
+            tournament = Tournament.deserialize_tournament(t)
             self.view.show_tournament(t_id, tournament)
             return tournament
         else:
@@ -403,7 +345,7 @@ class Controller:
                     '''
                     tournament = self.select_tournament()
                     players_list = sorted(
-                        self.players,
+                        tournament.players,
                         key=lambda x: (x.last_name, x.first_name)
                     )
                     if tournament is not None:
@@ -418,7 +360,7 @@ class Controller:
                     '''
                     tournament = self.select_tournament()
                     players_list = sorted(
-                        self.players,
+                        tournament.players,
                         key=lambda x: x.rank
                     )
                     if tournament is not None:
